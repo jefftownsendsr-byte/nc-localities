@@ -1,0 +1,7 @@
+output
+venv
+site/data
+.env
+.git
+*.zip
+__pycache__

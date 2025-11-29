@@ -1,0 +1,6 @@
+pre-commit
+pytest
+# Linting & formatting
+ruff
+black
+# Optional: add ruff or black later if you want more lint/formatting

@@ -1,0 +1,19 @@
+name: nc-localities
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - geopandas
+  - pandas
+  - requests
+  - osmnx
+  - overpy
+  - folium
+  - shapely
+  - fiona
+  - pyproj
+  - rasterio
+  - tqdm
+  - pip
+  - pip:
+    - pyproj

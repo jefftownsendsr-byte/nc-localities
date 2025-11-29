@@ -1,0 +1,13 @@
+geopandas
+pandas
+requests
+osmnx
+overpy
+folium
+shapely
+fiona
+pyproj
+rasterio
+tqdm
+pytest
+pre-commit
