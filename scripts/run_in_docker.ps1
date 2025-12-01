@@ -12,11 +12,12 @@ docker build -t $ImageName $repoRoot
 
 # Create host output folder if not exists
 if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null }
+# Resolve absolute path
 $absOutput = (Resolve-Path $OutputDir).Path
-
-docker run --rm -v "$absOutput:/workspace/output" -p $HostPort:8000 $ImageName
 Write-Host "Running Docker container (output -> $absOutput)" -ForegroundColor Cyan
 # Run, map output, and publish port for serving if needed
-docker run --rm -v "$($absOutput):/workspace/output" -p $($HostPort):8000 $ImageName
+$vol = $absOutput + ':/workspace/output'
+$port = $HostPort + ':8000'
+docker run --rm -v $vol -p $port $ImageName
 
 Write-Host "Container finished. Check $absOutput" -ForegroundColor Green
