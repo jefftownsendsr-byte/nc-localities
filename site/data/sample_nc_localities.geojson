@@ -1,1 +1,0 @@
-{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"final_name":"Sample Place","place":"city","population":1000},"geometry":{"type":"Point","coordinates":[-79.0,35.5]}}],"crs":{"type":"name","properties":{"name":"EPSG:4326"}}}

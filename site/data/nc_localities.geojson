@@ -1,1 +1,0 @@
-{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"osm_id": 1, "final_name": "Sample Place", "place": "city", "population": "1000"}, "geometry": {"type": "Point", "coordinates": [-79.0, 35.5]}}]}
