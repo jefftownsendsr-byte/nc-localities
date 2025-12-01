@@ -25,6 +25,21 @@ if ($Full) {
             mamba env create --file environment.yml --name nc-localities -y | Out-String | Write-Host
         }
         Write-Host "To activate the environment: 'conda activate nc-localities' (or 'mamba activate nc-localities' if using micromamba)" -ForegroundColor Green
+        # Also install development requirements inside the environment using mamba run
+        Write-Host "Installing dev dependencies in conda env via mamba run..." -ForegroundColor Cyan
+        try {
+            mamba run -n nc-localities python -m pip install -r requirements-dev.txt --disable-pip-version-check
+        } catch {
+            Write-Host "Failed to install dev requirements inside conda env; please run 'mamba run -n nc-localities python -m pip install -r requirements-dev.txt' manually." -ForegroundColor Yellow
+        }
+        Write-Host "Installing pre-commit into the conda env and registering hooks..." -ForegroundColor Cyan
+        try {
+            mamba run -n nc-localities python -m pip install pre-commit ruff black
+            mamba run -n nc-localities pre-commit install
+            mamba run -n nc-localities pre-commit run --all-files
+        } catch {
+            Write-Host "Pre-commit setup in conda env failed; run 'mamba run -n nc-localities pre-commit install' in the repository after activation." -ForegroundColor Yellow
+        }
     } elseif (Get-Command conda -ErrorAction SilentlyContinue) {
         Write-Host "Detected conda; using conda to create/update the environment from environment.yml" -ForegroundColor Cyan
         try {
@@ -33,9 +48,28 @@ if ($Full) {
             conda env create --file environment.yml --name nc-localities --yes | Out-String | Write-Host
         }
         Write-Host "To activate the environment: 'conda activate nc-localities'" -ForegroundColor Green
+        # Install dev requirements into the conda env using 'conda run' if available
+        Write-Host "Installing dev dependencies in conda env via conda run..." -ForegroundColor Cyan
+        try {
+            conda run -n nc-localities python -m pip install -r requirements-dev.txt --disable-pip-version-check
+        } catch {
+            Write-Host "Failed to install dev requirements inside conda env; please run 'conda run -n nc-localities python -m pip install -r requirements-dev.txt' manually." -ForegroundColor Yellow
+        }
+        Write-Host "Installing pre-commit into the conda env and registering hooks..." -ForegroundColor Cyan
+        try {
+            conda run -n nc-localities python -m pip install pre-commit ruff black
+            conda run -n nc-localities pre-commit install
+            conda run -n nc-localities pre-commit run --all-files
+        } catch {
+            Write-Host "Pre-commit install in conda env failed; run 'conda run -n nc-localities pre-commit install' after activation." -ForegroundColor Yellow
+        }
     } else {
         Write-Host "Conda/Mamba not found. Falling back to pip install. This may fail when building geospatial dependencies on Windows; we recommend installing conda/miniconda or using the Docker-based environment." -ForegroundColor Yellow
         python -m pip install -r requirements.txt
+        # Also install dev requirements if available
+        if (Test-Path .\requirements-dev.txt) {
+            python -m pip install -r requirements-dev.txt
+        }
     }
 } else {
     Write-Host "Installing dev requirements only (fast)" -ForegroundColor Cyan

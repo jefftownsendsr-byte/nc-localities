@@ -36,6 +36,12 @@ black --check .
 # Serve the site and visit http://localhost:8000
 ```
 
+On macOS/Linux, use the helper shell script:
+
+```bash
+./scripts/setup_dev.sh --full   # or without --full for venv dev only
+```
+
 Full build (requires conda for geopackages on Windows):
 
 ```powershell
@@ -43,6 +49,12 @@ conda env create -n nc-localities -f environment.yml
 conda activate nc-localities
 python .\scripts\build_nc_localities.py --output-dir .\output --year 2025 --non-interactive --pack-output
 python .\scripts\build_site.py --output-dir .\output --site-dir .\site
+```
+
+Docker-based full run (recommended on Windows if you don't want to manage conda install):
+
+```powershell
+.\scripts\run_in_docker.ps1
 ```
 
 Running tests:
@@ -62,6 +74,7 @@ Windows note:
 - If you're on Windows, installing geospatial dependencies via pip often fails because of GDAL/Fiona binary build requirements.
 - For best results, install `conda`/`mamba` and run: `conda env create -n nc-localities -f environment.yml` to get a working environment.
 - The helper `scripts/setup_dev.ps1 -Full` will prefer `mamba` if available and create/update the `nc-localities` environment.
+ - Use `scripts/check_env.ps1` to validate your environment and see a short set of recommended commands.
 
 Notes:
 - Use `--use-sample` when iterating quickly.
