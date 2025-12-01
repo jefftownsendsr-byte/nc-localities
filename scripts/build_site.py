@@ -12,11 +12,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
-import os
 from pathlib import Path
 import shutil
-import sys
 
 
 def copy_data(output_dir: Path, site_dir: Path):
@@ -47,9 +44,13 @@ def create_map(site_dir: Path, geojson_path: Path | None):
 
     map_html = site_dir / "map.html"
     if folium is None or geojson_path is None or not geojson_path.exists():
-        print("Folium not available or no geojson present; writing placeholder map.html")
+        print(
+            "Folium not available or no geojson present; writing placeholder map.html"
+        )
         with open(map_html, "w", encoding="utf8") as f:
-            f.write("<!doctype html>\n<html><body>\n<h1>NC Localities Map</h1>\n<p>Place `site/data/nc_localities.geojson` in `site/data/` to show the map.</p>\n</body></html>")
+            f.write(
+                "<!doctype html>\n<html><body>\n<h1>NC Localities Map</h1>\n<p>Place `site/data/nc_localities.geojson` in `site/data/` to show the map.</p>\n</body></html>"
+            )
         return
 
     # Build a simple folium map with markers
@@ -59,14 +60,18 @@ def create_map(site_dir: Path, geojson_path: Path | None):
     if gdf.empty:
         print("GeoJSON present but empty; writing placeholder map.html")
         with open(map_html, "w", encoding="utf8") as f:
-            f.write("<!doctype html>\n<html><body>\n<h1>NC Localities Map</h1>\n<p>No features found in GeoJSON.</p>\n</body></html>")
+            f.write(
+                "<!doctype html>\n<html><body>\n<h1>NC Localities Map</h1>\n<p>No features found in GeoJSON.</p>\n</body></html>"
+            )
         return
 
     # Create a center from the median coordinate or fallback to NC
     lats = gdf.geometry.y
     lngs = gdf.geometry.x
-    center = [float(lats.median()) if not lats.isnull().all() else 35.5,
-              float(lngs.median()) if not lngs.isnull().all() else -79.0]
+    center = [
+        float(lats.median()) if not lats.isnull().all() else 35.5,
+        float(lngs.median()) if not lngs.isnull().all() else -79.0,
+    ]
 
     m = folium.Map(location=center, zoom_start=7, tiles="OpenStreetMap")
     for _, row in gdf.iterrows():
@@ -74,8 +79,12 @@ def create_map(site_dir: Path, geojson_path: Path | None):
             continue
         lat = float(row.geometry.y)
         lon = float(row.geometry.x)
-        popup = folium.Popup(html=f"<b>{row.get('final_name', row.get('NAME', row.get('name', '')))}</b>")
-        folium.CircleMarker(location=(lat, lon), radius=3, color="blue", fill=True, popup=popup).add_to(m)
+        popup = folium.Popup(
+            html=f"<b>{row.get('final_name', row.get('NAME', row.get('name', '')))}</b>"
+        )
+        folium.CircleMarker(
+            location=(lat, lon), radius=3, color="blue", fill=True, popup=popup
+        ).add_to(m)
 
     m.save(str(map_html))
     print(f"Written interactive map: {map_html}")
@@ -83,9 +92,19 @@ def create_map(site_dir: Path, geojson_path: Path | None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output-dir", default="./output", help="Directory where pipeline exports are stored")
-    parser.add_argument("--site-dir", default="./site", help="Path to site/ folder to modify")
-    parser.add_argument("--year", default=None, help="Optional year argument (ignored) to stay compatible with older scripts")
+    parser.add_argument(
+        "--output-dir",
+        default="./output",
+        help="Directory where pipeline exports are stored",
+    )
+    parser.add_argument(
+        "--site-dir", default="./site", help="Path to site/ folder to modify"
+    )
+    parser.add_argument(
+        "--year",
+        default=None,
+        help="Optional year argument (ignored) to stay compatible with older scripts",
+    )
     args = parser.parse_args(argv)
 
     outdir = Path(args.output_dir).resolve()

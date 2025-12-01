@@ -16,4 +16,3 @@ This repository is structured so that different parts are covered by different l
 ## Attribution guidance
 - Always attribute OpenStreetMap in your UI or attribution panel with: "© OpenStreetMap contributors".
 - For maps showing Census data (e.g., TIGER boundaries), include a line "US Census TIGER/Line: public domain".
-
