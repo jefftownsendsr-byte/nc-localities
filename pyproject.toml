@@ -8,3 +8,7 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F", "W", "C", "B", "I"]
 ignore = ["E501"]
+
+[tool.isort]
+profile = "black"
+line_length = 88

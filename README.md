@@ -139,3 +139,17 @@ Quick dev mode (no network, fast):
 python .\scripts\build_nc_localities.py --output-dir .\output --use-sample
 python .\scripts\build_site.py --output-dir .\output --site-dir .\site
 ```
+
+Local CI checks and cleaning:
+
+```powershell
+# Run a local CI-like flow: lint, tests and sample pipeline
+.\scripts\run_ci_local.ps1 --RunConda
+# Or on Mac/Linux
+./scripts/run_ci_local.sh --conda
+
+# Clean up output and caches
+.\scripts\clean.ps1 -RemoveOutput -RemoveVenv
+# Or on Mac/Linux
+./scripts/clean.sh --output --venv
+```

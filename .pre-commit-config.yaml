@@ -13,6 +13,7 @@ repos:
     hooks:
       - id: black
         language_version: python3
+  # (isort not added: ruff handles import sorting; if you prefer isort, add it back with a known tag)
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.14.7
     hooks:
