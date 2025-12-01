@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+
 import pytest
 
 # The merge_and_export function is defined in scripts/build_nc_localities.py

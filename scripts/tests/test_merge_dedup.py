@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+
 import pytest
 
 build = pytest.importorskip("scripts.build_nc_localities")
