@@ -43,3 +43,36 @@ jobs:
         run: |
           chmod +x ./scripts/run_ci_local.sh
           ./scripts/run_ci_local.sh
+
+  pr-preview:
+    name: PR Preview deploy
+    needs: local-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up micromamba (mamba)
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-activate-base: false
+          miniforge-variant: Mambaforge
+      - name: Create conda env and install
+        run: |
+          micromamba create -n nc-localities -f environment.yml -y
+          micromamba activate -n nc-localities
+          micromamba run -n nc-localities python -m pip install -r requirements-dev.txt || true
+      - name: Build site in cond env
+        run: |
+          micromamba run -n nc-localities python scripts/build_nc_localities.py --output-dir output --non-interactive --pack-output
+          micromamba run -n nc-localities python scripts/build_site.py --output-dir output --site-dir site
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-artifact
+          path: site
+      - name: Deploy to gh-pages under pr-${{ github.event.number }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          destination_dir: pr-${{ github.event.number }}
