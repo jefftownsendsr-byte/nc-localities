@@ -20,8 +20,16 @@ cd 'C:\Users\Registered User\nc-localities'
 ```
 
 ```powershell
-# Serve the static site locally
+# Serve the static site locally (desktop and mobile access)
 .\scripts\serve_site.ps1
+
+To view the site from a mobile device on the same Wi-Fi network, run the server and find your host IP using `ipconfig` (Windows) or `ifconfig` (macOS). Then visit `http://<host-ip>:8000` in your phone's browser. If you need secure public access from outside the local network, consider using `ngrok`:
+
+```powershell
+# Install ngrok and run with the port 8000
+ngrok http 8000
+# Then copy the forwarding address to a mobile browser
+```
 ```
 
 Docker (Linux / WSL / Docker Desktop):

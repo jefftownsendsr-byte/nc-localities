@@ -45,11 +45,11 @@ def create_map(site_dir: Path, geojson_path: Path | None):
     map_html = site_dir / "map.html"
     if folium is None or geojson_path is None or not geojson_path.exists():
         print(
-            "Folium not available or no geojson present; writing placeholder map.html"
+            "Folium not available or no geojson present; writing responsive Leaflet placeholder map.html"
         )
         with open(map_html, "w", encoding="utf8") as f:
             f.write(
-                "<!doctype html>\n<html><body>\n<h1>NC Localities Map</h1>\n<p>Place `site/data/nc_localities.geojson` in `site/data/` to show the map.</p>\n</body></html>"
+                "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>NC Localities Map</title>\n<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\"/ crossorigin=\"\"/>\n<style>html,body,#map{height:100%;margin:0;padding:0}#map{height:100vh}</style>\n</head>\n<body>\n<div id=\"map\"></div>\n<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>\n<script>\nconst map = L.map('map').setView([35.5,-79.0], 7);\nL.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);\nfetch('data/nc_localities.geojson').then(r=>{if(!r.ok){document.body.innerHTML='<h1>No geojson found</h1><p>Put data/nc_localities.geojson into site/data/</p>';throw new Error('no geojson');}return r.json()}).then(gj=>{const layer = L.geoJSON(gj,{onEachFeature:(f,ly)=>{const p = f.properties||{};const name = p.final_name || p.NAME || p.name || '';ly.bindPopup('<b>'+name+'</b><br>'+ (p.place?('Place: '+p.place+'<br>'): '') + (p.population?('Population: '+p.population+'<br>'): ''))}}).addTo(map);map.fitBounds(layer.getBounds());}).catch(e=>console.warn(e));\n</script>\n</body>\n</html>"
             )
         return
 
