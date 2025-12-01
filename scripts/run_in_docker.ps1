@@ -16,8 +16,19 @@ if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Force -Path $Ou
 $absOutput = (Resolve-Path $OutputDir).Path
 Write-Host "Running Docker container (output -> $absOutput)" -ForegroundColor Cyan
 # Run, map output, and publish port for serving if needed
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "Docker command not found; install Docker Desktop and retry" -ForegroundColor Yellow
+    exit 1
+}
+try {
+    docker info > $null 2>&1
+} catch {
+    Write-Host "Docker daemon not running or not available; please start Docker Desktop" -ForegroundColor Yellow
+    exit 1
+}
+
 $vol = $absOutput + ':/workspace/output'
-$port = $HostPort + ':8000'
+$port = $($HostPort.ToString() + ':8000')
 docker run --rm -v $vol -p $port $ImageName
 
 Write-Host "Container finished. Check $absOutput" -ForegroundColor Green
