@@ -8,8 +8,8 @@ Usage:
 """
 
 import argparse
-import os
 import json
+import os
 import tempfile
 from pathlib import Path
 
@@ -134,7 +134,145 @@ def fetch_census_places(state_fips="37", year=2025):
 
 
 def merge_and_export(osm_gdf, census_gdf, output_dir: Path):
-    output_dir.mkdir(parents=True, exist_ok=True)
+    # Wrap the two helpers to keep public API backward-compatible
+    out_geo = prepare_out_geo(osm_gdf, census_gdf)
+    write_exports_and_map(out_geo, output_dir)
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output-dir", default="./output", help="Directory for exports"
+    )
+    parser.add_argument("--state", default="North Carolina")
+    parser.add_argument("--state-fips", default="37")
+    parser.add_argument(
+        "--year", default=2025, type=int, help="Census TIGER year (e.g., 2025)"
+    )
+    parser.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Run fully non-interactively (default: false)",
+    )
+    parser.add_argument(
+        "--pack-output",
+        action="store_true",
+        help="Zip output into a single archive after export",
+    )
+    parser.add_argument(
+        "--use-sample",
+        action="store_true",
+        help="Use a small sample dataset instead of fetching from OSM/Census for quick testing",
+    )
+    args = parser.parse_args(argv)
+    return args
+
+
+def get_osm_and_census(args, outdir: Path):
+    """Return (osm_gdf, census_gdf), handling sample mode and downloads."""
+    osm_gdf = None
+    census_gdf = None
+    if args.use_sample:
+        print("Using sample data for quick local testing...")
+        # If geopandas is available, construct a GeoDataFrame; otherwise write minimal output files directly.
+        try:
+            import geopandas as gpd_mod
+            from shapely.geometry import Point as ShapelyPoint
+
+            rows = [
+                {
+                    "osm_id": 1,
+                    "osm_type": "node",
+                    "name": "Sample Place",
+                    "place": "city",
+                    "population": "1000",
+                    "tags": {},
+                    "geometry": ShapelyPoint(-79.0, 35.5),
+                }
+            ]
+            osm_gdf = gpd_mod.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326")
+            census_gdf = gpd_mod.GeoDataFrame(
+                columns=["GEOID", "NAME", "geometry"],
+                geometry="geometry",
+                crs="EPSG:4326",
+            )
+        except Exception:
+            # Fall back to writing simple GeoJSON and CSV files to output for the build_site step
+            out_geojson_path = outdir / "nc_localities.geojson"
+            out_csv_path = outdir / "nc_localities.csv"
+            gj = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "osm_id": 1,
+                            "final_name": "Sample Place",
+                            "place": "city",
+                            "population": "1000",
+                        },
+                        "geometry": {"type": "Point", "coordinates": [-79.0, 35.5]},
+                    }
+                ],
+            }
+            outdir.mkdir(parents=True, exist_ok=True)
+            with open(out_geojson_path, "w", encoding="utf8") as fh:
+                json.dump(gj, fh)
+            with open(out_csv_path, "w", encoding="utf8") as fh:
+                fh.write(
+                    "osm_id,final_name,place,geoid,x,y\n1,Sample Place,city,,,-79.0,35.5\n"
+                )
+            print("Wrote sample geojson & csv to output folder (no geopandas required)")
+            # Create minimal in-memory placeholders so merge_and_export can proceed if needed
+            osm_gdf = None
+            census_gdf = None
+    else:
+        print("Fetching state polygon from Nominatim...")
+        state = fetch_state_polygon(args.state)
+        poly_geojson = state["geojson"]
+        poly_str = polygon_to_overpass_poly(poly_geojson)
+        print(
+            "Querying Overpass for place nodes/ways/relations in the state polygon..."
+        )
+        osm_gdf = fetch_osm_places(poly_str)
+
+    # If not sample mode, try fetching census
+    if not args.use_sample:
+        print(
+            "Downloading Census TIGER place shapefile (attempting the requested year, falling back if needed)..."
+        )
+        census_gdf = None
+        for y in range(args.year, 2019, -1):
+            try:
+                census_gdf = fetch_census_places(state_fips=args.state_fips, year=y)
+                print(
+                    f"Census TIGER places loaded (year {y}): {len(census_gdf)} features"
+                )
+                break
+            except Exception as e:
+                print(f"Failed to fetch Census TIGER places for {y}: {e}")
+                census_gdf = None
+    else:
+        census_gdf = None
+
+    if census_gdf is None:
+        print(
+            "No Census TIGER place shapefile could be fetched. Continuing with OSM points only."
+        )
+        if gpd is not None:
+            census_gdf = gpd.GeoDataFrame(
+                columns=["GEOID", "NAME", "geometry"],
+                geometry="geometry",
+                crs="EPSG:4326",
+            )
+        else:
+            census_gdf = None
+
+    return osm_gdf, census_gdf
+
+
+def prepare_out_geo(osm_gdf, census_gdf):
+    """Prepare final out_geo GeoDataFrame used for export and mapping."""
     census_gdf = census_gdf.to_crs("EPSG:4326")
     census_gdf = census_gdf[["GEOID", "NAME", "geometry"]].rename(
         columns={"NAME": "place_name", "GEOID": "geoid"}
@@ -158,10 +296,14 @@ def merge_and_export(osm_gdf, census_gdf, output_dir: Path):
     out_geo = out_geo.sort_values(by=["population"], ascending=False)
     out_geo = out_geo.drop_duplicates(subset=["dup_key"])
     out_geo = out_geo.drop(columns=["x_round", "y_round", "dup_key"])
-    geojson_path = output_dir / "nc_localities.geojson"
-    csv_path = output_dir / "nc_localities.csv"
-    shp_dir = output_dir / "nc_localities_shp"
-    html_path = output_dir / "nc_localities_map.html"
+    return out_geo
+
+
+def write_exports_and_map(out_geo, outdir: Path):
+    geojson_path = outdir / "nc_localities.geojson"
+    csv_path = outdir / "nc_localities.csv"
+    shp_dir = outdir / "nc_localities_shp"
+    html_path = outdir / "nc_localities_map.html"
     out_geo.to_file(geojson_path, driver="GeoJSON")
     out_geo.drop(columns="geometry").to_csv(csv_path, index=False)
     shp_dir.mkdir(parents=True, exist_ok=True)
@@ -172,8 +314,6 @@ def merge_and_export(osm_gdf, census_gdf, output_dir: Path):
         print("folium not installed; skipping HTML map")
         return
     center = [35.5, -79.0]
-    import folium
-
     m = folium.Map(location=center, zoom_start=7, tiles="OpenStreetMap")
     for _, row in out_geo.iterrows():
         coords = (row.geometry.y, row.geometry.x)
@@ -200,140 +340,6 @@ def merge_and_export(osm_gdf, census_gdf, output_dir: Path):
         except Exception as e:
             print(f"Warning: failed to copy map.html to site path: {e}")
 
-    def parse_args(argv=None):
-        parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "--output-dir", default="./output", help="Directory for exports"
-        )
-        parser.add_argument("--state", default="North Carolina")
-        parser.add_argument("--state-fips", default="37")
-        parser.add_argument(
-            "--year", default=2025, type=int, help="Census TIGER year (e.g., 2025)"
-        )
-        parser.add_argument(
-            "--non-interactive",
-            action="store_true",
-            help="Run fully non-interactively (default: false)",
-        )
-        parser.add_argument(
-            "--pack-output",
-            action="store_true",
-            help="Zip output into a single archive after export",
-        )
-        parser.add_argument(
-            "--use-sample",
-            action="store_true",
-            help="Use a small sample dataset instead of fetching from OSM/Census for quick testing",
-        )
-        args = parser.parse_args(argv)
-        return args
-
-    def get_osm_and_census(args, outdir: Path):
-        """Return (osm_gdf, census_gdf), handling sample mode and downloads."""
-        osm_gdf = None
-        census_gdf = None
-        if args.use_sample:
-            print("Using sample data for quick local testing...")
-            # If geopandas is available, construct a GeoDataFrame; otherwise write minimal output files directly.
-            try:
-                from shapely.geometry import Point as ShapelyPoint
-                import geopandas as gpd_mod
-
-                rows = [
-                    {
-                        "osm_id": 1,
-                        "osm_type": "node",
-                        "name": "Sample Place",
-                        "place": "city",
-                        "population": "1000",
-                        "tags": {},
-                        "geometry": ShapelyPoint(-79.0, 35.5),
-                    }
-                ]
-                osm_gdf = gpd_mod.GeoDataFrame(
-                    rows, geometry="geometry", crs="EPSG:4326"
-                )
-                census_gdf = gpd_mod.GeoDataFrame(
-                    columns=["GEOID", "NAME", "geometry"],
-                    geometry="geometry",
-                    crs="EPSG:4326",
-                )
-            except Exception:
-                # Fall back to writing simple GeoJSON and CSV files to output for the build_site step
-                out_geojson_path = outdir / "nc_localities.geojson"
-                out_csv_path = outdir / "nc_localities.csv"
-                gj = {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "properties": {
-                                "osm_id": 1,
-                                "final_name": "Sample Place",
-                                "place": "city",
-                                "population": "1000",
-                            },
-                            "geometry": {"type": "Point", "coordinates": [-79.0, 35.5]},
-                        }
-                    ],
-                }
-                outdir.mkdir(parents=True, exist_ok=True)
-                with open(out_geojson_path, "w", encoding="utf8") as fh:
-                    json.dump(gj, fh)
-                with open(out_csv_path, "w", encoding="utf8") as fh:
-                    fh.write(
-                        "osm_id,final_name,place,geoid,x,y\n1,Sample Place,city,,,-79.0,35.5\n"
-                    )
-                print(
-                    "Wrote sample geojson & csv to output folder (no geopandas required)"
-                )
-                # Create minimal in-memory placeholders so merge_and_export can proceed if needed
-                osm_gdf = None
-                census_gdf = None
-        else:
-            print("Fetching state polygon from Nominatim...")
-            state = fetch_state_polygon(args.state)
-            poly_geojson = state["geojson"]
-            poly_str = polygon_to_overpass_poly(poly_geojson)
-            print(
-                "Querying Overpass for place nodes/ways/relations in the state polygon..."
-            )
-            osm_gdf = fetch_osm_places(poly_str)
-
-        # If not sample mode, try fetching census
-        if not args.use_sample:
-            print(
-                "Downloading Census TIGER place shapefile (attempting the requested year, falling back if needed)..."
-            )
-            census_gdf = None
-            for y in range(args.year, 2019, -1):
-                try:
-                    census_gdf = fetch_census_places(state_fips=args.state_fips, year=y)
-                    print(
-                        f"Census TIGER places loaded (year {y}): {len(census_gdf)} features"
-                    )
-                    break
-                except Exception as e:
-                    print(f"Failed to fetch Census TIGER places for {y}: {e}")
-                    census_gdf = None
-        else:
-            census_gdf = None
-
-        if census_gdf is None:
-            print(
-                "No Census TIGER place shapefile could be fetched. Continuing with OSM points only."
-            )
-            if gpd is not None:
-                census_gdf = gpd.GeoDataFrame(
-                    columns=["GEOID", "NAME", "geometry"],
-                    geometry="geometry",
-                    crs="EPSG:4326",
-                )
-            else:
-                census_gdf = None
-
-        return osm_gdf, census_gdf
-
 
 def main(argv=None):
     # Entry point wrapper: parse args and run the pipeline
@@ -347,39 +353,10 @@ def main(argv=None):
             print(f"Fetched {len(osm_gdf)} OSM place elements")
         except Exception:
             print("Fetched OSM place elements (count unavailable)")
-    if not args.use_sample:
-        print(
-            "Downloading Census TIGER place shapefile (attempting the requested year, falling back if needed)..."
-        )
-        census_gdf = None
-        for y in range(args.year, 2019, -1):
-            try:
-                census_gdf = fetch_census_places(state_fips=args.state_fips, year=y)
-                print(
-                    f"Census TIGER places loaded (year {y}): {len(census_gdf)} features"
-                )
-                break
-            except Exception as e:
-                print(f"Failed to fetch Census TIGER places for {y}: {e}")
-                census_gdf = None
-    else:
-        # In sample mode, we skip fetching Census TIGER data
-        census_gdf = None
-
-    if census_gdf is None:
-        print(
-            "No Census TIGER place shapefile could be fetched. Continuing with OSM points only."
-        )
-        if gpd is not None:
-            census_gdf = gpd.GeoDataFrame(
-                columns=["GEOID", "NAME", "geometry"],
-                geometry="geometry",
-                crs="EPSG:4326",
-            )
-        else:
-            census_gdf = None
+    # get_osm_and_census() already handles census_gdf fetching and fallbacks
     if osm_gdf is not None:
-        merge_and_export(osm_gdf, census_gdf, outdir)
+        out_geo = prepare_out_geo(osm_gdf, census_gdf)
+        write_exports_and_map(out_geo, outdir)
     else:
         print("Sample mode created pre-built outputs; skipping merge/export step.")
     if args.pack_output:

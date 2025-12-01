@@ -52,8 +52,6 @@ def test_merge_and_export_produces_files(tmp_path: Path):
     assert (outdir / "nc_localities.csv").exists()
     assert (outdir / "nc_localities_shp" / "nc_localities.shp").exists()
     # Validate geojson content has FeatureCollection
-    import json
-
     gj = json.loads((outdir / "nc_localities.geojson").read_text(encoding="utf8"))
     assert gj["type"] == "FeatureCollection"
     assert len(gj["features"]) >= 1
