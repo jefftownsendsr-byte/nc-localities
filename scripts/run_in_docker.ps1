@@ -14,8 +14,9 @@ docker build -t $ImageName $repoRoot
 if (-not (Test-Path $OutputDir)) { New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null }
 $absOutput = (Resolve-Path $OutputDir).Path
 
+docker run --rm -v "$absOutput:/workspace/output" -p $HostPort:8000 $ImageName
 Write-Host "Running Docker container (output -> $absOutput)" -ForegroundColor Cyan
 # Run, map output, and publish port for serving if needed
-docker run --rm -v "$absOutput:/workspace/output" -p $HostPort:8000 $ImageName
+docker run --rm -v "$($absOutput):/workspace/output" -p $($HostPort):8000 $ImageName
 
 Write-Host "Container finished. Check $absOutput" -ForegroundColor Green
