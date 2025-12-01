@@ -58,6 +58,11 @@ Pre-commit:
 - `setup_dev.ps1` installs the hooks if this repo is a git repo and runs `pre-commit run --all-files` once.
 - Fix issues shown by pre-commit and commit changes; hooks will prevent bad commits.
 
+Windows note:
+- If you're on Windows, installing geospatial dependencies via pip often fails because of GDAL/Fiona binary build requirements.
+- For best results, install `conda`/`mamba` and run: `conda env create -n nc-localities -f environment.yml` to get a working environment.
+- The helper `scripts/setup_dev.ps1 -Full` will prefer `mamba` if available and create/update the `nc-localities` environment.
+
 Notes:
 - Use `--use-sample` when iterating quickly.
 - Use `conda` or Docker for reproducible builds when verifying full pipeline correctness.
