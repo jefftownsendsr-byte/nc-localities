@@ -24,6 +24,11 @@ echo "Running sample pipeline in venv..."
 python scripts/build_nc_localities.py --output-dir output --use-sample || exit 1
 python scripts/build_site.py --output-dir output --site-dir site || exit 1
 
+# Local preview cleanup simulation (create sample preview and run delete in dry-run)
+echo "Running local preview cleanup simulation"
+python scripts/dev_tools/preview_cleanup_local.py --pr 123 --site-dir site --create-sample || true
+python scripts/dev_tools/preview_cleanup_local.py --pr 123 --site-dir site --delete --dry-run || true
+
 if [ "$run_conda" = true ]; then
   if command -v conda >/dev/null 2>&1; then
     echo "Running tests inside conda env (nc-localities)"

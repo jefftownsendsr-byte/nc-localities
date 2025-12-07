@@ -1,3 +1,6 @@
+Manual deletion
+- If you want to manually remove a specific PR preview, use the **Manual PR Preview Cleanup** workflow accessible in `Actions` and run it with the `pr_number` input (e.g., 123), setting `dry_run=false` to perform the deletion instead of a dry run.
+
 # Developer Setup & Quick Guide
 
 This project provides a small pipeline and site generator. These steps get you up and running quickly for development.
@@ -79,3 +82,44 @@ Windows note:
 Notes:
 - Use `--use-sample` when iterating quickly.
 - Use `conda` or Docker for reproducible builds when verifying full pipeline correctness.
+
+## PR previews and cleanup
+
+CI will deploy a preview of the generated site for every PR to `gh-pages/pr-<PR_NUMBER>` and will post a PR comment titled `NC Localities PR preview` with the preview URL. This is handled by `.github/workflows/pr_local_ci.yml` and provides quick live previews for reviewers.
+
+Automatic cleanup:
+- When a PR is closed (merged or closed), the `pr_preview_cleanup.yml` workflow removes the `pr-<PR_NUMBER>` directory from `gh-pages` and deletes the PR preview comment so links don't go stale.
+- A scheduled workflow `pr_preview_age_cleanup.yml` runs daily and removes `pr-*` directories older than 7 days to keep `gh-pages` tidy. You can change the `STALE_DAYS` threshold in the workflow or set `DRY_RUN: 'true'` during testing.
+
+How to disable or tweak behavior:
+- To turn off automatic cleanup, remove or disable the file `.github/workflows/pr_preview_cleanup.yml`.
+- To change the retention period for stale previews, edit `.github/workflows/pr_preview_age_cleanup.yml` and modify `STALE_DAYS`.
+- To change how preview comments are shown or delete them manually, edit `.github/workflows/pr_local_ci.yml` where the comment is posted (it uses `peter-evans/create-or-update-comment` to keep a single comment per PR).
+
+Using a deploy token for protected `gh-pages` branches
+- If your repository protects `gh-pages` (or you want to use a dedicated token), create a personal access token with `repo` scope and add it as a repository secret called `DEPLOY_GH_PAGES_TOKEN`.
+- To create a PAT for GH Pages deployment (recommended when `gh-pages` is protected):
+	1. Go to https://github.com/settings/tokens (Personal access tokens), click "Generate new token".
+	2. Set a note like "nc-localities gh-pages deploy".
+	3. Select `repo` scope (full control of private repositories) and optionally `workflow` if needed.
+	4. Generate token and copy it (you won’t see it again).
+	5. In your repository: `Settings` → `Secrets` → `Actions` → `New repository secret` and create a secret `DEPLOY_GH_PAGES_TOKEN` with the PAT value.
+- The workflows will automatically try to use `DEPLOY_GH_PAGES_TOKEN` if present; otherwise they fall back to the default `GITHUB_TOKEN`.
+- You can create a token and add it in `Settings` > `Secrets and variables` > `Actions` > `New repository secret`.
+
+PR comment metadata and cleanup
+- The PR preview job stores metadata in `site/.preview-metadata/pr-<PR>.json` inside the deployed preview directory on `gh-pages` so cleanups can find and delete a specific comment by ID. The cleanup workflows prefer the stored `comment_id` for robust deletion, and fall back to the HTML marker if metadata is missing.
+
+Retention check
+- A scheduled workflow `pr_preview_retention_check.yml` runs daily to check the number of `pr-*` directories on `gh-pages`. If the number exceeds the configured threshold (default 100), it will open or update an issue on the repo so maintainers can take action.
+
+Manual testing and dry-run:
+- You can manually trigger the scheduled cleanup by using `Actions` > `PR Preview Age Cleanup` > Run workflow and set `dry_run=true` to test without committing changes.
+
+Security note:
+- These workflows use the built-in `GITHUB_TOKEN`. Ensure branch protections allow the token to push to `gh-pages` (or configure a deployment token in repository secrets if needed).
+
+Example comment & removal templates
+- Preview comment body: `✅ PR preview: https://<owner>.github.io/<repo>/pr-<number>/`
+- Cleanup removal comment body (updated upon PR close): `⚠️ PR preview removed: https://<owner>.github.io/<repo>/pr-<number>/ is no longer available.`
+- Comment title: `NC Localities PR preview` (used by the workflow to avoid duplicate preview comments in a single PR)

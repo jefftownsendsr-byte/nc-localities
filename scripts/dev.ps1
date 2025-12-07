@@ -19,10 +19,10 @@ if ($UseSample) {
     python .\scripts\build_nc_localities.py --output-dir .\output --use-sample
     python .\scripts\build_site.py --output-dir .\output --site-dir .\site
     Write-Host "Serving site on port 8000" -ForegroundColor Green
-    Start-Process -FilePath python -ArgumentList "-m", "http.server", "8000", "-d", ".\site" -NoNewWindow
+    Start-Process -FilePath python -ArgumentList "-m", "http.server", "8000", "--bind", "0.0.0.0", "-d", ".\site" -NoNewWindow
 } else {
     Write-Host "Running full build (this may take time)..." -ForegroundColor Yellow
     python .\scripts\build_nc_localities.py --output-dir .\output --non-interactive --pack-output --year 2025
     python .\scripts\build_site.py --output-dir .\output --site-dir .\site
-    Start-Process -FilePath python -ArgumentList "-m", "http.server", "8000", "-d", ".\site" -NoNewWindow
+    Start-Process -FilePath python -ArgumentList "-m", "http.server", "8000", "--bind", "0.0.0.0", "-d", ".\site" -NoNewWindow
 }

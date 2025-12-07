@@ -1,0 +1,62 @@
+name: PR Preview Retention Check
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # daily at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      max_previews:
+        description: 'Set threshold for max preview directories before alerting'
+        required: false
+        default: '100'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  retention-check:
+    runs-on: ubuntu-latest
+    env:
+      MAX_PREVIEWS: ${{ github.event.inputs.max_previews || '100' }}
+    steps:
+      - name: Check out gh-pages if it exists
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch gh-pages branch if it exists
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q 'refs/heads/gh-pages'; then
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+          else
+            echo "No gh-pages branch, nothing to check."
+            exit 0
+          fi
+      - name: Count PR preview dirs
+        id: count_previews
+        run: |
+          COUNT=$(ls -d pr-* 2>/dev/null | wc -l || true)
+          echo "Found ${COUNT} pr-* directories"
+          echo "count=${COUNT}" >> $GITHUB_OUTPUT
+      - name: Create or update retention issue
+        if: ${{ steps.count_previews.outputs.count && (toInt(steps.count_previews.outputs.count) > toInt(env.MAX_PREVIEWS)) }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const maxPreviews = parseInt(process.env.MAX_PREVIEWS, 10);
+            const count = parseInt('${{ steps.count_previews.outputs.count }}', 10);
+            const title = `PR Preview retention: ${count} previews present`;
+            const body = `There are currently ${count} PR preview builds in gh-pages, which exceeds the configured threshold of ${maxPreviews}. Consider running the scheduled cleanup or removing stale preview directories.\n\nFirst 20 previews:\n`;
+            const previews = (await github.paginate('GET /repos/{owner}/{repo}/contents', { owner, repo })).filter(x => x.type === 'dir' && x.name.startsWith('pr-')).slice(0, 20).map(x => `- ${x.name}`).join('\n');
+            const fullBody = body + previews;
+            // search for existing open issue with the same title
+            const { data: issues } = await github.issues.listForRepo({ owner, repo, state: 'open' });
+            const existing = issues.find(i => i.title === title);
+            if (existing) {
+              await github.issues.createComment({ owner, repo, issue_number: existing.number, body: `Automated update: ${count} previews currently present.` });
+            } else {
+              await github.issues.create({ owner, repo, title, body: fullBody });
+            }

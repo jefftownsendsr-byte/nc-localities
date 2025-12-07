@@ -20,6 +20,211 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          tags: ghcr.io/${{ github.repository }}/nc-localities:latest
+
+  build-windows-exe:
+    name: Build Windows EXE
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.11'
+      - name: Create env and run PyInstaller
+        run: |
+          conda create -n nc-build -y python=3.11
+          conda activate nc-build
+          conda install -n base -y -c conda-forge mamba
+          mamba install -n nc-build -y -c conda-forge pyinstaller geopandas requests osmnx folium || true
+          pip install pyinstaller
+          pyinstaller --onefile --name nc_localities scripts\build_nc_localities.py
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: nc_localities-exe
+          path: dist\nc_localities.exe
+
+  pr_preview:
+    name: Preview site for pull request
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python for sample pipeline
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dev tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Run sample pipeline
+        run: |
+          python scripts/build_nc_localities.py --output-dir ./output --use-sample --non-interactive
+          python scripts/build_site.py --output-dir ./output --site-dir ./site
+      - name: Post preview URL as PR comment
+        id: post_preview_comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          title: "NC Localities PR preview"
+          body: |
+            ✅ PR preview: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
+            <!-- nc-localities-pr-preview: pr-${{ github.event.pull_request.number }} -->
+      - name: Write preview metadata into site
+        run: |
+          COMMENT_ID="${{ steps.post_preview_comment.outputs.comment_id }}"
+          if [ -z "$COMMENT_ID" ]; then
+            COMMENT_ID="${{ steps.post_preview_comment.outputs.id }}"
+          fi
+          mkdir -p site/.preview-metadata
+          cat > site/.preview-metadata/pr-${{ github.event.pull_request.number }}.json <<'JSON'
+          {
+            "pr": ${{ github.event.pull_request.number }},
+            "comment_id": "${COMMENT_ID}",
+            "preview_url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/",
+            "created_at": "${{ github.event.pull_request.created_at }}"
+          }
+          JSON
+          echo "Wrote preview metadata to site/.preview-metadata/pr-${{ github.event.pull_request.number }}.json"
+      - name: Deploy PR preview to gh-pages branch per-PR
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.DEPLOY_GH_PAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages-pr-${{ github.event.pull_request.number }}
+          publish_dir: ./site
+
+  build-conda-pipeline:
+    name: Build and run full pipeline (Conda)
+    runs-on: ubuntu-latest
+    needs: [build-docker, test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.11'
+      - name: Create conda env using mamba (faster)
+        run: |
+          conda install -n base -y -c conda-forge mamba
+          mamba env create -n nc-localities -f environment.yml -y
+      - name: Run full pipeline using conda env
+        run: |
+          conda run -n nc-localities python scripts/build_nc_localities.py --output-dir ./output --state 'North Carolina' --state-fips 37 --year 2025 --non-interactive --pack-output
+          conda run -n nc-localities python scripts/build_site.py --output-dir ./output --site-dir ./site
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-artifact
+          path: ./site
+
+  test:
+    name: Run smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pre-commit ruff black
+      - name: Lint and run tests
+        run: |
+          pre-commit run --all-files
+          ruff check . || true
+          pytest -q
+
+  test-conda:
+    name: Run tests under conda environment
+    runs-on: ubuntu-latest
+    needs: [build-conda-pipeline]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.11'
+      - name: Create conda env and install deps (with mamba)
+        run: |
+          conda install -n base -y -c conda-forge mamba
+          mamba env create -n nc-test -f environment.yml -y
+      - name: Install dev tools in conda env
+        run: |
+          conda run -n nc-test pip install -r requirements-dev.txt
+      - name: Run tests in conda env
+        run: |
+          conda run -n nc-test pytest -q
+
+  deploy:
+    name: Deploy site to GitHub Pages and Release EXE
+    needs: [build-conda-pipeline, build-windows-exe, test-conda]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download site artifact from build-conda-pipeline
+        uses: actions/download-artifact@v4
+        with:
+          name: site-artifact
+          path: ./site
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.DEPLOY_GH_PAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+      - name: Create a GitHub Release and upload EXE
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: 'v0.1.${{ github.run_number }}'
+          name: 'nc_localities-${{ github.run_number }}'
+          body: 'Automated release: nc_localities build and site from CI'
+      - name: Download EXE artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nc_localities-exe
+          path: ./dist
+      - name: Upload EXE to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: './dist/nc_localities.exe'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: Build and Publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -83,7 +288,7 @@ jobs:
       - name: Deploy PR preview to gh-pages branch per-PR
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.DEPLOY_GH_PAGES_TOKEN || secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages-pr-${{ github.event.pull_request.number }}
           publish_dir: ./site
       # pr_preview removed from nested context to be a top-level job
@@ -96,12 +301,38 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
+            - name: Post preview URL as PR comment
+              id: post_preview_comment
+              uses: peter-evans/create-or-update-comment@v4
+              with:
+                token: ${{ secrets.GITHUB_TOKEN }}
+                issue-number: ${{ github.event.pull_request.number }}
+                title: "NC Localities PR preview"
+                body: |
+                  ✅ PR preview: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
+                  <!-- nc-localities-pr-preview: pr-${{ github.event.pull_request.number }} -->
           python-version: '3.11'
       - name: Cache conda, mamba and pip cache
         uses: actions/cache@v4
         with:
           path: |
             ~/.conda/pkgs
+            - name: Write preview metadata into site
+              run: |
+                COMMENT_ID="${{ steps.post_preview_comment.outputs.comment_id }}"
+                if [ -z "$COMMENT_ID" ]; then
+                  COMMENT_ID="${{ steps.post_preview_comment.outputs.id }}"
+                fi
+                mkdir -p site/.preview-metadata
+                cat > site/.preview-metadata/pr-${{ github.event.pull_request.number }}.json <<'JSON'
+                {
+                  "pr": ${{ github.event.pull_request.number }},
+                  "comment_id": "${COMMENT_ID}",
+                  "preview_url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/",
+                  "created_at": "${{ github.event.pull_request.created_at }}"
+                }
+                JSON
+                echo "Wrote preview metadata to site/.preview-metadata/pr-${{ github.event.pull_request.number }}.json"
             ~/.mamba
             ~/.cache/pip
           key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}
@@ -209,7 +440,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.DEPLOY_GH_PAGES_TOKEN || secrets.GITHUB_TOKEN }}
           publish_dir: ./site
       - name: Create a GitHub Release and upload EXE
         id: create_release

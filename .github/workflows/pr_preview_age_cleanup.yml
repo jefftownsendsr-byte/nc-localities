@@ -1,0 +1,79 @@
+name: PR Preview Age Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run - don't commit changes (true/false)'
+        required: false
+        default: 'false'
+  schedule:
+    - cron: '0 0 * * *' # daily at 00:00 UTC
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    env:
+      DRY_RUN: 'false' # set true to test without committing
+      STALE_DAYS: '7'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch gh-pages branch if it exists
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q 'refs/heads/gh-pages'; then
+            echo "gh-pages branch found; fetching"
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+          else
+            echo "No gh-pages branch, nothing to clean."
+            exit 0
+          fi
+
+      - name: Remove stale PR preview directories
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # detect dry run input (workflow_dispatch) or fallback to env default
+          if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ] && [ -n "${{ github.event.inputs.dry_run }}" ]; then
+            DRY_RUN='${{ github.event.inputs.dry_run }}'
+          fi
+          THRESHOLD_SECONDS=$(( STALE_DAYS * 24 * 60 * 60 ))
+          NOW=$(date +%s)
+          echo "Removing preview directories older than ${STALE_DAYS} days (DRY_RUN=${DRY_RUN})"
+          for DIR in pr-*; do
+            if [ -d "$DIR" ]; then
+              last_commit_ts=$(git log -1 --format=%ct -- "$DIR" 2>/dev/null || echo 0)
+              if [ -z "$last_commit_ts" ] || [ "$last_commit_ts" -eq 0 ]; then
+                echo "No commits for $DIR; skipping"
+                continue
+              fi
+              age=$(( NOW - last_commit_ts ))
+              if [ "$age" -gt "$THRESHOLD_SECONDS" ]; then
+                echo "Stale: $DIR (age: $age seconds)"
+                if [ "$DRY_RUN" = 'true' ]; then
+                  echo "DRY RUN: would remove $DIR"
+                else
+                  git rm -r "$DIR" || true
+                fi
+              fi
+            fi
+          done
+          if [ "$DRY_RUN" = 'false' ]; then
+            if git diff --quiet --exit-code; then
+              echo "No stale pr-*/ directories found"
+            else
+              git commit -m "ci: remove stale PR previews older than ${STALE_DAYS} days"
+              if [ -n "${{ secrets.DEPLOY_GH_PAGES_TOKEN }}" ]; then
+                git remote set-url origin https://x-access-token:${{ secrets.DEPLOY_GH_PAGES_TOKEN }}@github.com/${{ github.repository }}.git
+              fi
+              git push origin gh-pages
+            fi
+          fi

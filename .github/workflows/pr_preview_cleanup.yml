@@ -1,0 +1,85 @@
+name: PR Preview Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch gh-pages branch if it exists
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q 'refs/heads/gh-pages'; then
+            echo "gh-pages branch found; fetching"
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+          else
+            echo "No gh-pages branch, nothing to delete."
+            exit 0
+          fi
+
+      - name: Remove preview directory for PR
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          PR_DIR=pr-${PR_NUMBER}
+          echo "Removing ${PR_DIR} from gh-pages (if present)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -d "${PR_DIR}" ]; then
+            # before removing PR dir, try to gather metadata about the comment id
+            METADATA_FILE="${PR_DIR}/.preview-metadata/pr-${PR_NUMBER}.json"
+            if [ -f "${METADATA_FILE}" ]; then
+              echo "Found metadata at ${METADATA_FILE}";
+              COMMENT_ID=$(jq -r '.comment_id' "${METADATA_FILE}") || true
+              echo "COMMENT_ID=${COMMENT_ID}" >> $GITHUB_ENV
+            else
+              echo "No metadata file at ${METADATA_FILE}; will fall back to marker-based cleanup"
+            fi
+            git rm -r "${PR_DIR}" || true
+            if git diff --quiet --exit-code; then
+              echo "No changes to commit; nothing to remove."
+              else
+              git commit -m "ci: remove PR preview ${PR_DIR} (pr ${PR_NUMBER})"
+              if [ -n "${{ secrets.DEPLOY_GH_PAGES_TOKEN }}" ]; then
+                git remote set-url origin https://x-access-token:${{ secrets.DEPLOY_GH_PAGES_TOKEN }}@github.com/${{ github.repository }}.git
+              fi
+              git push origin gh-pages
+            fi
+          else
+            echo "No preview dir ${PR_DIR} found; skipping"
+          fi
+
+      - name: Delete PR preview comment (if present)
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.number;
+            const env_comment_id = process.env.COMMENT_ID || '';
+            if (env_comment_id) {
+              core.info(`Deleting comment by ID ${env_comment_id}`);
+              await github.issues.deleteComment({ owner, repo, comment_id: parseInt(env_comment_id, 10) });
+            } else {
+              const marker = `<!-- nc-localities-pr-preview: pr-${issue_number} -->`;
+              const { data: comments } = await github.issues.listComments({ owner, repo, issue_number });
+              for (const c of comments) {
+                if (c.body && c.body.includes(marker)) {
+                  core.info(`Deleting comment ${c.id} containing marker ${marker}`);
+                  await github.issues.deleteComment({ owner, repo, comment_id: c.id });
+                }
+              }
+            }
+*** End Patch

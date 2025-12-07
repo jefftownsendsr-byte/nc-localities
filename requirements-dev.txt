@@ -3,4 +3,6 @@ pytest
 # Linting & formatting
 ruff
 black
+# Optional helper HTTP client for local dev tools
+requests
 # Optional: add ruff or black later if you want more lint/formatting

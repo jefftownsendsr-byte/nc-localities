@@ -1,29 +1,44 @@
-# Ignore build outputs
+# Build outputs
 output/
 site/data/
+dist/
+build/
+*.zip
 
 # Python virtual envs
 .venv/
 venv/
+env/
+ENV/
 
-# PyInstaller
-dist/
-build/
-
-# caches and compiled
+# Python cache and compiled
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Node modules (if any)
-node_modules/
-
-# mac specific
-*.DS_Store
+desktop.ini
 
 # IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Node modules (if any)
+node_modules/

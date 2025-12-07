@@ -1,4 +1,7 @@
 name: PR Local CI
+permissions:
+  contents: write
+  issues: write
 
 on:
   pull_request:
@@ -70,9 +73,43 @@ jobs:
         with:
           name: site-artifact
           path: site
+      # Comment and metadata are posted prior to deploying site so metadata is included in the deploy
+      - name: Post preview URL as PR comment
+        id: post_preview_comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          title: "NC Localities PR preview"
+          body: |
+            ✅ PR preview: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.number }}/
+            <!-- nc-localities-pr-preview: pr-${{ github.event.number }} -->
+      - name: Write preview metadata into site (comment_id fallback)
+        run: |
+          COMMENT_ID="${{ steps.post_preview_comment.outputs.comment_id }}"
+          if [ -z "$COMMENT_ID" ]; then
+            COMMENT_ID="${{ steps.post_preview_comment.outputs.id }}"
+          fi
+          if [ -z "$COMMENT_ID" ]; then
+            echo "No comment_id found from post_preview_comment step; skipping writing metadata"
+            exit 0
+          fi
+          mkdir -p site/.preview-metadata
+          cat > site/.preview-metadata/pr-${{ github.event.number }}.json <<'JSON'
+          {
+            "pr": ${{ github.event.number }},
+            "comment_id": "${COMMENT_ID}",
+            "preview_url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.number }}/",
+            "created_at": "${{ github.event.pull_request.created_at }}"
+          }
+          JSON
+          echo "Wrote preview metadata to site/.preview-metadata/pr-${{ github.event.number }}.json"
+
       - name: Deploy to gh-pages under pr-${{ github.event.number }}
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.DEPLOY_GH_PAGES_TOKEN || secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           destination_dir: pr-${{ github.event.number }}
+          keep_files: true
+      # comment published earlier
