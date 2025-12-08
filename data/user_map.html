@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ff9acfdcba7f1539fd4339706a7e8d59 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+</head>
+<body>
+    
+    
+<div style="position: fixed; 
+            top: 10px; left: 50px; width: 500px; height: 90px; 
+            background-color: white; border:2px solid grey; z-index:9999; 
+            font-size:16px; padding: 10px; border-radius: 5px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);">
+    <h3 style="margin: 0; color: #2c3e50;">North Carolina Mineral Collecting Sites</h3>
+    <p style="margin: 5px 0; font-size: 12px; color: #7f8c8d;">
+        Based on "Mineral Collecting Sites in North Carolina"<br>
+        By W.F. Wilson and B.J. McKenzie (1978)
+    </p>
+</div>
+    
+            <div class="folium-map" id="map_ff9acfdcba7f1539fd4339706a7e8d59" ></div>
+        
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9a5b67964819f4ce","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.9.1","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+<script>
+    
+    
+            var map_ff9acfdcba7f1539fd4339706a7e8d59 = L.map(
+                "map_ff9acfdcba7f1539fd4339706a7e8d59",
+                {
+                    center: [35.5, -80.0],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 7,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+
+            
+
+        
+    
+            var tile_layer_085974d310845c771dff3f94e27d5cc5 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_085974d310845c771dff3f94e27d5cc5.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var tile_layer_bcee0e1123409e6ef3350046d3ae166e = L.tileLayer(
+                "https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.jpg",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_bcee0e1123409e6ef3350046d3ae166e.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var tile_layer_9a512a716dd574ca351f9210e1d3578c = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_9a512a716dd574ca351f9210e1d3578c.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_605abd482e2a20662bf776ff88bffb99 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_834b4871e167618a9a5cd11b01dd0a7e = L.circleMarker(
+                [35.8533, -79.42],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_605abd482e2a20662bf776ff88bffb99);
+        
+    
+        var popup_1f382ce1ae46e53332c1c360ade889d4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a7648298e378c43fce7ef0f2dc365391 = $(`<div id="html_a7648298e378c43fce7ef0f2dc365391" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Snow Camp Mine (Holman's Mill)</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Alamance</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #1</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Pyrophyllite, diaspore, sericite, pyrite, topaz, quartz crystals</p>     </div>     </div>`)[0];
+                popup_1f382ce1ae46e53332c1c360ade889d4.setContent(html_a7648298e378c43fce7ef0f2dc365391);
+            
+        
+
+        circle_marker_834b4871e167618a9a5cd11b01dd0a7e.bindPopup(popup_1f382ce1ae46e53332c1c360ade889d4)
+        ;
+
+        
+    
+    
+            circle_marker_834b4871e167618a9a5cd11b01dd0a7e.bindTooltip(
+                `<div>
+                     Snow Camp Mine (Holman's Mill) (Alamance Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_605abd482e2a20662bf776ff88bffb99.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_eeef69e1c129357d5451b39903a0cb3d = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_f879f80499a4a4c636a2c7c34bde4ff4 = L.circleMarker(
+                [35.9183, -81.0842],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_eeef69e1c129357d5451b39903a0cb3d);
+        
+    
+        var popup_d1c3703a8e0688f3919aa25eba715144 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_fa63d7f8af4fee91d66a4e2249b0c341 = $(`<div id="html_fa63d7f8af4fee91d66a4e2249b0c341" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Emerald Valley Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Alexander</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #2</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Emerald, aquamarine beryl, rose quartz, rutile</p>     </div>     </div>`)[0];
+                popup_d1c3703a8e0688f3919aa25eba715144.setContent(html_fa63d7f8af4fee91d66a4e2249b0c341);
+            
+        
+
+        circle_marker_f879f80499a4a4c636a2c7c34bde4ff4.bindPopup(popup_d1c3703a8e0688f3919aa25eba715144)
+        ;
+
+        
+    
+    
+            circle_marker_f879f80499a4a4c636a2c7c34bde4ff4.bindTooltip(
+                `<div>
+                     Emerald Valley Mine (Alexander Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6b84d5a8c2aaf53ca3215c0b66bc014f = L.circleMarker(
+                [35.935, -81.065],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_eeef69e1c129357d5451b39903a0cb3d);
+        
+    
+        var popup_5743702f3f3d2c43d2b5e0055733bcba = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7a55a756164658142bd1b0d69e122a72 = $(`<div id="html_7a55a756164658142bd1b0d69e122a72" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">McCoury Farm</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Alexander</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #3</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Rutilated quartz</p>     </div>     </div>`)[0];
+                popup_5743702f3f3d2c43d2b5e0055733bcba.setContent(html_7a55a756164658142bd1b0d69e122a72);
+            
+        
+
+        circle_marker_6b84d5a8c2aaf53ca3215c0b66bc014f.bindPopup(popup_5743702f3f3d2c43d2b5e0055733bcba)
+        ;
+
+        
+    
+    
+            circle_marker_6b84d5a8c2aaf53ca3215c0b66bc014f.bindTooltip(
+                `<div>
+                     McCoury Farm (Alexander Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e54ce605028d6531274a52a081f0e4c3 = L.circleMarker(
+                [35.952, -81.095],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_eeef69e1c129357d5451b39903a0cb3d);
+        
+    
+        var popup_69aea1683e1951c504e0889b00dfb64b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b39594f2066aa5fc8cee68d1a2bef6c8 = $(`<div id="html_b39594f2066aa5fc8cee68d1a2bef6c8" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">George Lackey Property</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Alexander</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #4</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Rutile, rutilated quartz, rose quartz</p>     </div>     </div>`)[0];
+                popup_69aea1683e1951c504e0889b00dfb64b.setContent(html_b39594f2066aa5fc8cee68d1a2bef6c8);
+            
+        
+
+        circle_marker_e54ce605028d6531274a52a081f0e4c3.bindPopup(popup_69aea1683e1951c504e0889b00dfb64b)
+        ;
+
+        
+    
+    
+            circle_marker_e54ce605028d6531274a52a081f0e4c3.bindTooltip(
+                `<div>
+                     George Lackey Property (Alexander Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_eeef69e1c129357d5451b39903a0cb3d.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_55df384ff65fd742ce2e094b09f638c0 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_179855b62d446dbe56ae5d448d7ffa0d = L.circleMarker(
+                [36.535, -81.155],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_55df384ff65fd742ce2e094b09f638c0);
+        
+    
+        var popup_7ff27113eb50d4d5095ba47d43e4ae36 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_058b89ba726fb5e9c112e66c18b7c12b = $(`<div id="html_058b89ba726fb5e9c112e66c18b7c12b" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Bald Knob (Crouse Knob)</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Alleghany</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #5</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Manganese minerals - alleghanyite, spessartite, tephroite, galaxite</p>     </div>     </div>`)[0];
+                popup_7ff27113eb50d4d5095ba47d43e4ae36.setContent(html_058b89ba726fb5e9c112e66c18b7c12b);
+            
+        
+
+        circle_marker_179855b62d446dbe56ae5d448d7ffa0d.bindPopup(popup_7ff27113eb50d4d5095ba47d43e4ae36)
+        ;
+
+        
+    
+    
+            circle_marker_179855b62d446dbe56ae5d448d7ffa0d.bindTooltip(
+                `<div>
+                     Bald Knob (Crouse Knob) (Alleghany Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9d2cc96c36a43ea9b4ac248d7e03b6f3 = L.circleMarker(
+                [36.55, -81.02],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_55df384ff65fd742ce2e094b09f638c0);
+        
+    
+        var popup_44fd67cd4f5af0c25d3c09226b54a570 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_fcefb18830268144ec865b271e8caf5c = $(`<div id="html_fcefb18830268144ec865b271e8caf5c" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">North of Amelia</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Alleghany</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #6</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Barite</p>     </div>     </div>`)[0];
+                popup_44fd67cd4f5af0c25d3c09226b54a570.setContent(html_fcefb18830268144ec865b271e8caf5c);
+            
+        
+
+        circle_marker_9d2cc96c36a43ea9b4ac248d7e03b6f3.bindPopup(popup_44fd67cd4f5af0c25d3c09226b54a570)
+        ;
+
+        
+    
+    
+            circle_marker_9d2cc96c36a43ea9b4ac248d7e03b6f3.bindTooltip(
+                `<div>
+                     North of Amelia (Alleghany Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_55df384ff65fd742ce2e094b09f638c0.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_3c04c225ad5d0b612f832a072f7fe7d2 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_4b264d31b61d290721c65b228e899acd = L.circleMarker(
+                [36.525, -81.375],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "purple", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_3c04c225ad5d0b612f832a072f7fe7d2);
+        
+    
+        var popup_455d481dd089420c39d800f92bf45a96 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e6bf05ca40d4484a04626df6561c4381 = $(`<div id="html_e6bf05ca40d4484a04626df6561c4381" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Ore Knob Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Ashe</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #7</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Biotite, actinolite, garnet, chalcopyrite, pyrite, cuprite, malachite, azurite</p>     </div>     </div>`)[0];
+                popup_455d481dd089420c39d800f92bf45a96.setContent(html_e6bf05ca40d4484a04626df6561c4381);
+            
+        
+
+        circle_marker_4b264d31b61d290721c65b228e899acd.bindPopup(popup_455d481dd089420c39d800f92bf45a96)
+        ;
+
+        
+    
+    
+            circle_marker_4b264d31b61d290721c65b228e899acd.bindTooltip(
+                `<div>
+                     Ore Knob Mine (Ashe Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_01bcb74c207d16d16320edef9078d7b7 = L.circleMarker(
+                [36.395, -81.52],
+                {"bubblingMouseEvents": true, "color": "purple", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "purple", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_3c04c225ad5d0b612f832a072f7fe7d2);
+        
+    
+        var popup_bc6e026a235ec1a36a547d212b8088eb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_91830bc13247c89fd911002f7ff96c7e = $(`<div id="html_91830bc13247c89fd911002f7ff96c7e" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Duncan Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Ashe</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #8</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Beryl, muscovite, biotite, garnet, feldspar, quartz</p>     </div>     </div>`)[0];
+                popup_bc6e026a235ec1a36a547d212b8088eb.setContent(html_91830bc13247c89fd911002f7ff96c7e);
+            
+        
+
+        circle_marker_01bcb74c207d16d16320edef9078d7b7.bindPopup(popup_bc6e026a235ec1a36a547d212b8088eb)
+        ;
+
+        
+    
+    
+            circle_marker_01bcb74c207d16d16320edef9078d7b7.bindTooltip(
+                `<div>
+                     Duncan Mine (Ashe Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_3c04c225ad5d0b612f832a072f7fe7d2.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_ff09c9813ae0733650b919fa267b4baf = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_47f7b65827645b7693ef2a92b5ceea01 = L.circleMarker(
+                [36.0533, -81.9183],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_ff09c9813ae0733650b919fa267b4baf);
+        
+    
+        var popup_bfb01b06092fdca63775d0453ca91820 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_68c82aa1c133239accc75fa0aece7bfb = $(`<div id="html_68c82aa1c133239accc75fa0aece7bfb" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Cranberry Iron Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Avery</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #9</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Magnetite, uralite, hornblende, epidote, garnet</p>     </div>     </div>`)[0];
+                popup_bfb01b06092fdca63775d0453ca91820.setContent(html_68c82aa1c133239accc75fa0aece7bfb);
+            
+        
+
+        circle_marker_47f7b65827645b7693ef2a92b5ceea01.bindPopup(popup_bfb01b06092fdca63775d0453ca91820)
+        ;
+
+        
+    
+    
+            circle_marker_47f7b65827645b7693ef2a92b5ceea01.bindTooltip(
+                `<div>
+                     Cranberry Iron Mine (Avery Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_02b92f545d54259ffa0f4d3c76774589 = L.circleMarker(
+                [36.08, -81.95],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_ff09c9813ae0733650b919fa267b4baf);
+        
+    
+        var popup_d2d7dcfc9ff62ffd1399ac6c6e0b9a89 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_92b768429347cff93a483c94aa26fb7a = $(`<div id="html_92b768429347cff93a483c94aa26fb7a" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Frank Deposit</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Avery</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #10</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Vermiculite, anthophyllite, dunite</p>     </div>     </div>`)[0];
+                popup_d2d7dcfc9ff62ffd1399ac6c6e0b9a89.setContent(html_92b768429347cff93a483c94aa26fb7a);
+            
+        
+
+        circle_marker_02b92f545d54259ffa0f4d3c76774589.bindPopup(popup_d2d7dcfc9ff62ffd1399ac6c6e0b9a89)
+        ;
+
+        
+    
+    
+            circle_marker_02b92f545d54259ffa0f4d3c76774589.bindTooltip(
+                `<div>
+                     Frank Deposit (Avery Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_ff09c9813ae0733650b919fa267b4baf.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_dbb284babcbb741c3d40d90a4c5b21a1 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_28b030984e3802e56935f81e1a292cdc = L.circleMarker(
+                [35.715, -82.365],
+                {"bubblingMouseEvents": true, "color": "darkred", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkred", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_dbb284babcbb741c3d40d90a4c5b21a1);
+        
+    
+        var popup_b375fbfaab665e81dc6995a6f2073e1d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_440c3815df3b063a5cac2f6610b39ab9 = $(`<div id="html_440c3815df3b063a5cac2f6610b39ab9" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Potato Gap - Blue Ridge Parkway</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Buncombe</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #11</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Garnet</p>     </div>     </div>`)[0];
+                popup_b375fbfaab665e81dc6995a6f2073e1d.setContent(html_440c3815df3b063a5cac2f6610b39ab9);
+            
+        
+
+        circle_marker_28b030984e3802e56935f81e1a292cdc.bindPopup(popup_b375fbfaab665e81dc6995a6f2073e1d)
+        ;
+
+        
+    
+    
+            circle_marker_28b030984e3802e56935f81e1a292cdc.bindTooltip(
+                `<div>
+                     Potato Gap - Blue Ridge Parkway (Buncombe Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a3d1294427fe5c9858fe7753a15ac2a6 = L.circleMarker(
+                [35.635, -82.31],
+                {"bubblingMouseEvents": true, "color": "darkred", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkred", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_dbb284babcbb741c3d40d90a4c5b21a1);
+        
+    
+        var popup_128ea802a72bd547366d289d131d8078 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_62ff2a7fd8c9175c0d383412c3674a55 = $(`<div id="html_62ff2a7fd8c9175c0d383412c3674a55" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Balsam Gap</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Buncombe</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #12</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Pink corundum</p>     </div>     </div>`)[0];
+                popup_128ea802a72bd547366d289d131d8078.setContent(html_62ff2a7fd8c9175c0d383412c3674a55);
+            
+        
+
+        circle_marker_a3d1294427fe5c9858fe7753a15ac2a6.bindPopup(popup_128ea802a72bd547366d289d131d8078)
+        ;
+
+        
+    
+    
+            circle_marker_a3d1294427fe5c9858fe7753a15ac2a6.bindTooltip(
+                `<div>
+                     Balsam Gap (Buncombe Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_32a78182642c1e482a4e315298256148 = L.circleMarker(
+                [35.655, -82.685],
+                {"bubblingMouseEvents": true, "color": "darkred", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkred", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_dbb284babcbb741c3d40d90a4c5b21a1);
+        
+    
+        var popup_656ec78ff84e1af2bafe1b4bae78e877 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_155e694d1212f18f05abf5b03b245df3 = $(`<div id="html_155e694d1212f18f05abf5b03b245df3" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Goldsmith Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Buncombe</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #13</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Moonstone, chalcedony, garnet, olivine, vermiculite</p>     </div>     </div>`)[0];
+                popup_656ec78ff84e1af2bafe1b4bae78e877.setContent(html_155e694d1212f18f05abf5b03b245df3);
+            
+        
+
+        circle_marker_32a78182642c1e482a4e315298256148.bindPopup(popup_656ec78ff84e1af2bafe1b4bae78e877)
+        ;
+
+        
+    
+    
+            circle_marker_32a78182642c1e482a4e315298256148.bindTooltip(
+                `<div>
+                     Goldsmith Mine (Buncombe Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_dbb284babcbb741c3d40d90a4c5b21a1.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_821ae55bf66e0b0a81d4691ffa645788 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_ea3cf0141fd80068dab58304018a1b8b = L.circleMarker(
+                [35.745, -81.935],
+                {"bubblingMouseEvents": true, "color": "lightred", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightred", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_821ae55bf66e0b0a81d4691ffa645788);
+        
+    
+        var popup_7fdc32dae7d9cfa1798a691f2c32b21f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_ac4669d58a1a1345d19d835f8460c138 = $(`<div id="html_ac4669d58a1a1345d19d835f8460c138" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Brindletown Creek Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Burke</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #14</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Gold, tetradymite, brookite, smoky quartz, chromite, anatase, beryl, tourmaline, zircon</p>     </div>     </div>`)[0];
+                popup_7fdc32dae7d9cfa1798a691f2c32b21f.setContent(html_ac4669d58a1a1345d19d835f8460c138);
+            
+        
+
+        circle_marker_ea3cf0141fd80068dab58304018a1b8b.bindPopup(popup_7fdc32dae7d9cfa1798a691f2c32b21f)
+        ;
+
+        
+    
+    
+            circle_marker_ea3cf0141fd80068dab58304018a1b8b.bindTooltip(
+                `<div>
+                     Brindletown Creek Area (Burke Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_23e036a3106637ce6521515e1e721248 = L.circleMarker(
+                [35.6383, -81.6883],
+                {"bubblingMouseEvents": true, "color": "lightred", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightred", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_821ae55bf66e0b0a81d4691ffa645788);
+        
+    
+        var popup_79e902012ba31d2719e7c41ccc80187c = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8361b26d7ae14a8b62653ef477d2ed4c = $(`<div id="html_8361b26d7ae14a8b62653ef477d2ed4c" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Tweedy Garnet Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Burke</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #15</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Garnet, pyrope, rhodolite (Public access, fee site)</p>     </div>     </div>`)[0];
+                popup_79e902012ba31d2719e7c41ccc80187c.setContent(html_8361b26d7ae14a8b62653ef477d2ed4c);
+            
+        
+
+        circle_marker_23e036a3106637ce6521515e1e721248.bindPopup(popup_79e902012ba31d2719e7c41ccc80187c)
+        ;
+
+        
+    
+    
+            circle_marker_23e036a3106637ce6521515e1e721248.bindTooltip(
+                `<div>
+                     Tweedy Garnet Mine (Burke Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_821ae55bf66e0b0a81d4691ffa645788.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_feffa56efa91f5bd5982654bad938881 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_fc777daca58a195510035de8a51c28c9 = L.circleMarker(
+                [35.255, -80.455],
+                {"bubblingMouseEvents": true, "color": "beige", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "beige", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_feffa56efa91f5bd5982654bad938881);
+        
+    
+        var popup_5bcdafc19860312645f3cca26416695e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8e6c59ad88ba8e2b843ab6ab19bc29a1 = $(`<div id="html_8e6c59ad88ba8e2b843ab6ab19bc29a1" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Reed Gold Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Cabarrus</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #16</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Gold, pyrite, chalcopyrite (Historic site, public access)</p>     </div>     </div>`)[0];
+                popup_5bcdafc19860312645f3cca26416695e.setContent(html_8e6c59ad88ba8e2b843ab6ab19bc29a1);
+            
+        
+
+        circle_marker_fc777daca58a195510035de8a51c28c9.bindPopup(popup_5bcdafc19860312645f3cca26416695e)
+        ;
+
+        
+    
+    
+            circle_marker_fc777daca58a195510035de8a51c28c9.bindTooltip(
+                `<div>
+                     Reed Gold Mine (Cabarrus Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ca8e440ba39a3e800b70dff3ddde9634 = L.circleMarker(
+                [35.415, -80.365],
+                {"bubblingMouseEvents": true, "color": "beige", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "beige", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_feffa56efa91f5bd5982654bad938881);
+        
+    
+        var popup_6619ded92b90961cd2cbeeeec748f2ce = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7f8afc3efbc8634c1137eb0bdeb87598 = $(`<div id="html_7f8afc3efbc8634c1137eb0bdeb87598" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Silver Shaft</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Cabarrus</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #17</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Siderite, pyrite, scheelite, chalcopyrite, magnetite, malachite</p>     </div>     </div>`)[0];
+                popup_6619ded92b90961cd2cbeeeec748f2ce.setContent(html_7f8afc3efbc8634c1137eb0bdeb87598);
+            
+        
+
+        circle_marker_ca8e440ba39a3e800b70dff3ddde9634.bindPopup(popup_6619ded92b90961cd2cbeeeec748f2ce)
+        ;
+
+        
+    
+    
+            circle_marker_ca8e440ba39a3e800b70dff3ddde9634.bindTooltip(
+                `<div>
+                     Silver Shaft (Cabarrus Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_feffa56efa91f5bd5982654bad938881.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_b799e98e0715d0ed727f1fc242d21061 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_51a6d69dc1f943bf5ab0b33bd400d253 = L.circleMarker(
+                [36.025, -81.585],
+                {"bubblingMouseEvents": true, "color": "darkblue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkblue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_b799e98e0715d0ed727f1fc242d21061);
+        
+    
+        var popup_eff5f895b36991fc1049c2601e38525d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6243c836940aafea0792b02f86b524bd = $(`<div id="html_6243c836940aafea0792b02f86b524bd" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Little River</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Caldwell</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #18</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Rhodolite garnet in biotite schist</p>     </div>     </div>`)[0];
+                popup_eff5f895b36991fc1049c2601e38525d.setContent(html_6243c836940aafea0792b02f86b524bd);
+            
+        
+
+        circle_marker_51a6d69dc1f943bf5ab0b33bd400d253.bindPopup(popup_eff5f895b36991fc1049c2601e38525d)
+        ;
+
+        
+    
+    
+            circle_marker_51a6d69dc1f943bf5ab0b33bd400d253.bindTooltip(
+                `<div>
+                     Little River (Caldwell Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ad3866810b52df79c63dc035c1eec776 = L.circleMarker(
+                [35.995, -81.645],
+                {"bubblingMouseEvents": true, "color": "darkblue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkblue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_b799e98e0715d0ed727f1fc242d21061);
+        
+    
+        var popup_f620c3aa662836b2c5ca8e7220c84c32 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d8529b8d3b0726f974526978b9d2d85e = $(`<div id="html_d8529b8d3b0726f974526978b9d2d85e" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">John's River</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Caldwell</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #19</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Anthophyllite asbestos, talc</p>     </div>     </div>`)[0];
+                popup_f620c3aa662836b2c5ca8e7220c84c32.setContent(html_d8529b8d3b0726f974526978b9d2d85e);
+            
+        
+
+        circle_marker_ad3866810b52df79c63dc035c1eec776.bindPopup(popup_f620c3aa662836b2c5ca8e7220c84c32)
+        ;
+
+        
+    
+    
+            circle_marker_ad3866810b52df79c63dc035c1eec776.bindTooltip(
+                `<div>
+                     John's River (Caldwell Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_b799e98e0715d0ed727f1fc242d21061.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_1137f79948e1e33a4c83fe3a5dd598cd = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_95e13616714f5bbf50af9776eb4a7970 = L.circleMarker(
+                [35.035, -83.815],
+                {"bubblingMouseEvents": true, "color": "darkgreen", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkgreen", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_1137f79948e1e33a4c83fe3a5dd598cd);
+        
+    
+        var popup_d663a63bfd1bc16162ced92f8658af10 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1943c7116f33017c9b8de06c8a1ef9f6 = $(`<div id="html_1943c7116f33017c9b8de06c8a1ef9f6" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Buck Creek</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Clay</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #20</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Corundum (gray to pink), olivine, anorthite, picrolite, spinel, zoisite</p>     </div>     </div>`)[0];
+                popup_d663a63bfd1bc16162ced92f8658af10.setContent(html_1943c7116f33017c9b8de06c8a1ef9f6);
+            
+        
+
+        circle_marker_95e13616714f5bbf50af9776eb4a7970.bindPopup(popup_d663a63bfd1bc16162ced92f8658af10)
+        ;
+
+        
+    
+    
+            circle_marker_95e13616714f5bbf50af9776eb4a7970.bindTooltip(
+                `<div>
+                     Buck Creek (Clay Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b854df54ebe6ebc400fd200c3c2086b2 = L.circleMarker(
+                [35.055, -83.785],
+                {"bubblingMouseEvents": true, "color": "darkgreen", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkgreen", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_1137f79948e1e33a4c83fe3a5dd598cd);
+        
+    
+        var popup_4866f56274b6bece6ef08e1f31b8c407 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_973dae092dbf876ee47df69e0d1db0c1 = $(`<div id="html_973dae092dbf876ee47df69e0d1db0c1" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Shooting Creek</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Clay</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #21</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Rutile crystals</p>     </div>     </div>`)[0];
+                popup_4866f56274b6bece6ef08e1f31b8c407.setContent(html_973dae092dbf876ee47df69e0d1db0c1);
+            
+        
+
+        circle_marker_b854df54ebe6ebc400fd200c3c2086b2.bindPopup(popup_4866f56274b6bece6ef08e1f31b8c407)
+        ;
+
+        
+    
+    
+            circle_marker_b854df54ebe6ebc400fd200c3c2086b2.bindTooltip(
+                `<div>
+                     Shooting Creek (Clay Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_1137f79948e1e33a4c83fe3a5dd598cd.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_22a8ef408cc3c733d70675f40875b641 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_936c7a97e46b5b7165b728d618714d7a = L.circleMarker(
+                [35.265, -81.295],
+                {"bubblingMouseEvents": true, "color": "cadetblue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cadetblue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_22a8ef408cc3c733d70675f40875b641);
+        
+    
+        var popup_b8c6c907a41d5ee3647feb7189d7e252 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_bd6be3949d3527af6393f9aac94ce37a = $(`<div id="html_bd6be3949d3527af6393f9aac94ce37a" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Tin-Spodumene Belt (Bessemer City)</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Gaston</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #22</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Cassiterite, feldspar, mica, garnet, beryl, spodumene, apatite</p>     </div>     </div>`)[0];
+                popup_b8c6c907a41d5ee3647feb7189d7e252.setContent(html_bd6be3949d3527af6393f9aac94ce37a);
+            
+        
+
+        circle_marker_936c7a97e46b5b7165b728d618714d7a.bindPopup(popup_b8c6c907a41d5ee3647feb7189d7e252)
+        ;
+
+        
+    
+    
+            circle_marker_936c7a97e46b5b7165b728d618714d7a.bindTooltip(
+                `<div>
+                     Tin-Spodumene Belt (Bessemer City) (Gaston Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7340600d0d710e5eaafe40e1ba74190e = L.circleMarker(
+                [35.385, -81.125],
+                {"bubblingMouseEvents": true, "color": "cadetblue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "cadetblue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_22a8ef408cc3c733d70675f40875b641);
+        
+    
+        var popup_e96bde737fa5386c33b2c5cba6d7bc66 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c7261814d6cea9ef31aba1e36b6fba63 = $(`<div id="html_c7261814d6cea9ef31aba1e36b6fba63" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Alexis Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Gaston</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #23</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Kyanite, tourmaline, rutile, lazulite</p>     </div>     </div>`)[0];
+                popup_e96bde737fa5386c33b2c5cba6d7bc66.setContent(html_c7261814d6cea9ef31aba1e36b6fba63);
+            
+        
+
+        circle_marker_7340600d0d710e5eaafe40e1ba74190e.bindPopup(popup_e96bde737fa5386c33b2c5cba6d7bc66)
+        ;
+
+        
+    
+    
+            circle_marker_7340600d0d710e5eaafe40e1ba74190e.bindTooltip(
+                `<div>
+                     Alexis Area (Gaston Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_22a8ef408cc3c733d70675f40875b641.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_c585549fd2587c0f35246815f832f11d = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_3c349999f64dde0e9f5e5abae957ef94 = L.circleMarker(
+                [35.145, -83.415],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "pink", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_c585549fd2587c0f35246815f832f11d);
+        
+    
+        var popup_8672ef6db3fa15728a3d55f9ef64a839 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_899fa633244962936a2c4dd865099d52 = $(`<div id="html_899fa633244962936a2c4dd865099d52" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Caler Creek Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Macon</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #24</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Ruby, sapphire, garnet (Fee mine)</p>     </div>     </div>`)[0];
+                popup_8672ef6db3fa15728a3d55f9ef64a839.setContent(html_899fa633244962936a2c4dd865099d52);
+            
+        
+
+        circle_marker_3c349999f64dde0e9f5e5abae957ef94.bindPopup(popup_8672ef6db3fa15728a3d55f9ef64a839)
+        ;
+
+        
+    
+    
+            circle_marker_3c349999f64dde0e9f5e5abae957ef94.bindTooltip(
+                `<div>
+                     Caler Creek Mine (Macon Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ed291ae1d5433d863a3c3b2bee7a1029 = L.circleMarker(
+                [35.155, -83.405],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "pink", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_c585549fd2587c0f35246815f832f11d);
+        
+    
+        var popup_75fc0b4b1b42d8f10b75a11fd387c826 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_339de296a0a920b0872a50821b1236b1 = $(`<div id="html_339de296a0a920b0872a50821b1236b1" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Cherokee Ruby Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Macon</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #25</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Ruby, sapphire, rhodolite garnet (Fee mine)</p>     </div>     </div>`)[0];
+                popup_75fc0b4b1b42d8f10b75a11fd387c826.setContent(html_339de296a0a920b0872a50821b1236b1);
+            
+        
+
+        circle_marker_ed291ae1d5433d863a3c3b2bee7a1029.bindPopup(popup_75fc0b4b1b42d8f10b75a11fd387c826)
+        ;
+
+        
+    
+    
+            circle_marker_ed291ae1d5433d863a3c3b2bee7a1029.bindTooltip(
+                `<div>
+                     Cherokee Ruby Mine (Macon Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_96740c64a1558c253c09c2f69a206bf2 = L.circleMarker(
+                [35.165, -83.425],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "pink", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_c585549fd2587c0f35246815f832f11d);
+        
+    
+        var popup_c76df4b9f4bf4d0157d8538487245c79 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_bc0d3ec7c7ad09cba4fc93c5f219f4c3 = $(`<div id="html_bc0d3ec7c7ad09cba4fc93c5f219f4c3" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Bonanza Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Macon</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #26</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Ruby, sapphire, garnet (Fee mine)</p>     </div>     </div>`)[0];
+                popup_c76df4b9f4bf4d0157d8538487245c79.setContent(html_bc0d3ec7c7ad09cba4fc93c5f219f4c3);
+            
+        
+
+        circle_marker_96740c64a1558c253c09c2f69a206bf2.bindPopup(popup_c76df4b9f4bf4d0157d8538487245c79)
+        ;
+
+        
+    
+    
+            circle_marker_96740c64a1558c253c09c2f69a206bf2.bindTooltip(
+                `<div>
+                     Bonanza Mine (Macon Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c95cf2b51a3c425ef77175a2d33ed7ab = L.circleMarker(
+                [35.135, -83.395],
+                {"bubblingMouseEvents": true, "color": "pink", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "pink", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_c585549fd2587c0f35246815f832f11d);
+        
+    
+        var popup_85a87c5b0f38907bb828db04313b70b8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b3cf8a77b61960cbb0e376e8b2557a7a = $(`<div id="html_b3cf8a77b61960cbb0e376e8b2557a7a" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Sheffield Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Macon</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #27</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Ruby, sapphire, garnet, moonstone (Fee mine)</p>     </div>     </div>`)[0];
+                popup_85a87c5b0f38907bb828db04313b70b8.setContent(html_b3cf8a77b61960cbb0e376e8b2557a7a);
+            
+        
+
+        circle_marker_c95cf2b51a3c425ef77175a2d33ed7ab.bindPopup(popup_85a87c5b0f38907bb828db04313b70b8)
+        ;
+
+        
+    
+    
+            circle_marker_c95cf2b51a3c425ef77175a2d33ed7ab.bindTooltip(
+                `<div>
+                     Sheffield Mine (Macon Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_c585549fd2587c0f35246815f832f11d.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_5efed2042fc5f11e229feb07fdb28394 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_a3a3a79881d825696a14d435ce8e45be = L.circleMarker(
+                [35.745, -82.065],
+                {"bubblingMouseEvents": true, "color": "lightblue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_5efed2042fc5f11e229feb07fdb28394);
+        
+    
+        var popup_d0f191fd34371b60d16a636398d1de1a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_90e241cbaa67b87f7655f32d0f3e800f = $(`<div id="html_90e241cbaa67b87f7655f32d0f3e800f" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Dysartsville Area (Diamond)</h4>         <p style="margin: 5px 0;"><strong>County:</strong> McDowell</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #28</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Diamond, gold, sapphire, rutile, monazite</p>     </div>     </div>`)[0];
+                popup_d0f191fd34371b60d16a636398d1de1a.setContent(html_90e241cbaa67b87f7655f32d0f3e800f);
+            
+        
+
+        circle_marker_a3a3a79881d825696a14d435ce8e45be.bindPopup(popup_d0f191fd34371b60d16a636398d1de1a)
+        ;
+
+        
+    
+    
+            circle_marker_a3a3a79881d825696a14d435ce8e45be.bindTooltip(
+                `<div>
+                     Dysartsville Area (Diamond) (McDowell Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_5efed2042fc5f11e229feb07fdb28394.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_0ef618e42273ffc8cb64fbf5de82d511 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_f73273d85afe1a09823c171477c0c558 = L.circleMarker(
+                [35.227, -80.8431],
+                {"bubblingMouseEvents": true, "color": "gray", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "gray", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0ef618e42273ffc8cb64fbf5de82d511);
+        
+    
+        var popup_169c5d9cd3adcff05703983c3625aeac = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3a5e46135afb543dcb84ab44d6d59c91 = $(`<div id="html_3a5e46135afb543dcb84ab44d6d59c91" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Mecklenburg Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Mecklenburg</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #29</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Gold, beryl, garnet</p>     </div>     </div>`)[0];
+                popup_169c5d9cd3adcff05703983c3625aeac.setContent(html_3a5e46135afb543dcb84ab44d6d59c91);
+            
+        
+
+        circle_marker_f73273d85afe1a09823c171477c0c558.bindPopup(popup_169c5d9cd3adcff05703983c3625aeac)
+        ;
+
+        
+    
+    
+            circle_marker_f73273d85afe1a09823c171477c0c558.bindTooltip(
+                `<div>
+                     Mecklenburg Area (Mecklenburg Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_0ef618e42273ffc8cb64fbf5de82d511.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_1cb685f65dcef7d28fb4e8b1ffb898b2 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_bc42180220b47a8123c187d048957278 = L.circleMarker(
+                [36.015, -82.105],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_1cb685f65dcef7d28fb4e8b1ffb898b2);
+        
+    
+        var popup_427e28d454f94b8dc2daddc1b2c2dd29 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4dcb99414cd002b13a43aca2e6220865 = $(`<div id="html_4dcb99414cd002b13a43aca2e6220865" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Hawk Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Mitchell</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #30</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Garnet, apatite, epidote, allanite, tourmaline, pyrite, thulite</p>     </div>     </div>`)[0];
+                popup_427e28d454f94b8dc2daddc1b2c2dd29.setContent(html_4dcb99414cd002b13a43aca2e6220865);
+            
+        
+
+        circle_marker_bc42180220b47a8123c187d048957278.bindPopup(popup_427e28d454f94b8dc2daddc1b2c2dd29)
+        ;
+
+        
+    
+    
+            circle_marker_bc42180220b47a8123c187d048957278.bindTooltip(
+                `<div>
+                     Hawk Mine (Mitchell Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_39a4659b8529b57c5f4a22e8c20a48e6 = L.circleMarker(
+                [35.925, -82.165],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_1cb685f65dcef7d28fb4e8b1ffb898b2);
+        
+    
+        var popup_cd686c15cad4070f8d8084294803c312 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_67038009397d47665acc1d762f3af068 = $(`<div id="html_67038009397d47665acc1d762f3af068" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Crabtree Emerald Mine</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Mitchell</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #31</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Emerald (Public fee site)</p>     </div>     </div>`)[0];
+                popup_cd686c15cad4070f8d8084294803c312.setContent(html_67038009397d47665acc1d762f3af068);
+            
+        
+
+        circle_marker_39a4659b8529b57c5f4a22e8c20a48e6.bindPopup(popup_cd686c15cad4070f8d8084294803c312)
+        ;
+
+        
+    
+    
+            circle_marker_39a4659b8529b57c5f4a22e8c20a48e6.bindTooltip(
+                `<div>
+                     Crabtree Emerald Mine (Mitchell Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_92056cf7e4ea68b2a7854b39d4d29e6b = L.circleMarker(
+                [35.915, -82.065],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_1cb685f65dcef7d28fb4e8b1ffb898b2);
+        
+    
+        var popup_906a3baa46b87503ca4b26aaaf168258 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c51e9cc23389737fbde94cd347c8aa8c = $(`<div id="html_c51e9cc23389737fbde94cd347c8aa8c" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Spruce Pine Mining District</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Mitchell</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #32</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Feldspar, mica, quartz, beryl, garnet, uraninite, monazite</p>     </div>     </div>`)[0];
+                popup_906a3baa46b87503ca4b26aaaf168258.setContent(html_c51e9cc23389737fbde94cd347c8aa8c);
+            
+        
+
+        circle_marker_92056cf7e4ea68b2a7854b39d4d29e6b.bindPopup(popup_906a3baa46b87503ca4b26aaaf168258)
+        ;
+
+        
+    
+    
+            circle_marker_92056cf7e4ea68b2a7854b39d4d29e6b.bindTooltip(
+                `<div>
+                     Spruce Pine Mining District (Mitchell Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_1cb685f65dcef7d28fb4e8b1ffb898b2.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_f625154b820d9ac33b7a995e52433493 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_d4626193c3548d8799f20c183c4244bd = L.circleMarker(
+                [35.305, -82.255],
+                {"bubblingMouseEvents": true, "color": "lightgreen", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightgreen", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_f625154b820d9ac33b7a995e52433493);
+        
+    
+        var popup_78465d79303dabd5a2f7a86198ed4f40 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a85b97973dbea578b70a38a0e9f98476 = $(`<div id="html_a85b97973dbea578b70a38a0e9f98476" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">White Oak Mountain</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Polk</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #33</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Kyanite, staurolite, garnet</p>     </div>     </div>`)[0];
+                popup_78465d79303dabd5a2f7a86198ed4f40.setContent(html_a85b97973dbea578b70a38a0e9f98476);
+            
+        
+
+        circle_marker_d4626193c3548d8799f20c183c4244bd.bindPopup(popup_78465d79303dabd5a2f7a86198ed4f40)
+        ;
+
+        
+    
+    
+            circle_marker_d4626193c3548d8799f20c183c4244bd.bindTooltip(
+                `<div>
+                     White Oak Mountain (Polk Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_f625154b820d9ac33b7a995e52433493.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_5ae0ccad439bec97ea46eefb40c2037e = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_b84b7ebdd6636804f9c572703c701336 = L.circleMarker(
+                [36.465, -79.715],
+                {"bubblingMouseEvents": true, "color": "lightgray", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightgray", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_5ae0ccad439bec97ea46eefb40c2037e);
+        
+    
+        var popup_b14e652d0eed375181371d27400afe6c = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f3e233adeb1a7876c5bc3dae680a1454 = $(`<div id="html_f3e233adeb1a7876c5bc3dae680a1454" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Dan River Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Rockingham</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #34</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Petrified wood, agate, jasper</p>     </div>     </div>`)[0];
+                popup_b14e652d0eed375181371d27400afe6c.setContent(html_f3e233adeb1a7876c5bc3dae680a1454);
+            
+        
+
+        circle_marker_b84b7ebdd6636804f9c572703c701336.bindPopup(popup_b14e652d0eed375181371d27400afe6c)
+        ;
+
+        
+    
+    
+            circle_marker_b84b7ebdd6636804f9c572703c701336.bindTooltip(
+                `<div>
+                     Dan River Area (Rockingham Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_5ae0ccad439bec97ea46eefb40c2037e.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_f36acc897f4dd3d594de8c11188bedce = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_8139f74b8b69b9ee3e3296aa4148395a = L.circleMarker(
+                [35.405, -80.115],
+                {"bubblingMouseEvents": true, "color": "darkpurple", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkpurple", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_f36acc897f4dd3d594de8c11188bedce);
+        
+    
+        var popup_f11ab73219bb2cee51a6e91999443037 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_dd861da97daa8fefecc6a66814157bb7 = $(`<div id="html_dd861da97daa8fefecc6a66814157bb7" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Badin Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Stanly</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #35</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Gold, garnet, pyrite</p>     </div>     </div>`)[0];
+                popup_f11ab73219bb2cee51a6e91999443037.setContent(html_dd861da97daa8fefecc6a66814157bb7);
+            
+        
+
+        circle_marker_8139f74b8b69b9ee3e3296aa4148395a.bindPopup(popup_f11ab73219bb2cee51a6e91999443037)
+        ;
+
+        
+    
+    
+            circle_marker_8139f74b8b69b9ee3e3296aa4148395a.bindTooltip(
+                `<div>
+                     Badin Area (Stanly Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_f36acc897f4dd3d594de8c11188bedce.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_8d5157b511a65a0d2bc68995526d5f91 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_f2b56b329e4406cd64c8e537cd165fc3 = L.circleMarker(
+                [35.395, -83.585],
+                {"bubblingMouseEvents": true, "color": "white", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "white", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_8d5157b511a65a0d2bc68995526d5f91);
+        
+    
+        var popup_6e3bbc4b3754c61507d41e63a1c0dba4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e462b5c0b3dc5724296e2992b663f605 = $(`<div id="html_e462b5c0b3dc5724296e2992b663f605" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Almond Area Pegmatites</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Swain</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #36</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Beryl, garnet, feldspar, mica</p>     </div>     </div>`)[0];
+                popup_6e3bbc4b3754c61507d41e63a1c0dba4.setContent(html_e462b5c0b3dc5724296e2992b663f605);
+            
+        
+
+        circle_marker_f2b56b329e4406cd64c8e537cd165fc3.bindPopup(popup_6e3bbc4b3754c61507d41e63a1c0dba4)
+        ;
+
+        
+    
+    
+            circle_marker_f2b56b329e4406cd64c8e537cd165fc3.bindTooltip(
+                `<div>
+                     Almond Area Pegmatites (Swain Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_8d5157b511a65a0d2bc68995526d5f91.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_fef0c6b9c9b4d77d9969c20323c5e8dc = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_c5a2348371f36497135a6491b7be4093 = L.circleMarker(
+                [35.145, -82.825],
+                {"bubblingMouseEvents": true, "color": "darkgray", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkgray", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_fef0c6b9c9b4d77d9969c20323c5e8dc);
+        
+    
+        var popup_f484c600a5e3d87925e852aba18cd2f0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1e362372c4815c16d29acdbb8dc807e6 = $(`<div id="html_1e362372c4815c16d29acdbb8dc807e6" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Rosman Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Transylvania</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #37</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Beryl, garnet, monazite</p>     </div>     </div>`)[0];
+                popup_f484c600a5e3d87925e852aba18cd2f0.setContent(html_1e362372c4815c16d29acdbb8dc807e6);
+            
+        
+
+        circle_marker_c5a2348371f36497135a6491b7be4093.bindPopup(popup_f484c600a5e3d87925e852aba18cd2f0)
+        ;
+
+        
+    
+    
+            circle_marker_c5a2348371f36497135a6491b7be4093.bindTooltip(
+                `<div>
+                     Rosman Area (Transylvania Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_fef0c6b9c9b4d77d9969c20323c5e8dc.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_18ae83d6cd0ffe99af95d812f429808f = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_1aed1c98a06767d74ffff25c3598a6fc = L.circleMarker(
+                [36.385, -78.455],
+                {"bubblingMouseEvents": true, "color": "lightgray", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightgray", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_18ae83d6cd0ffe99af95d812f429808f);
+        
+    
+        var popup_ae4d5241bb06027b2d62575dfdde2a72 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_50346466e1a70efacaf28da7fc6943dd = $(`<div id="html_50346466e1a70efacaf28da7fc6943dd" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Hamme Tungsten District</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Vance</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #38</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Scheelite, wolframite, pyrite, chalcopyrite</p>     </div>     </div>`)[0];
+                popup_ae4d5241bb06027b2d62575dfdde2a72.setContent(html_50346466e1a70efacaf28da7fc6943dd);
+            
+        
+
+        circle_marker_1aed1c98a06767d74ffff25c3598a6fc.bindPopup(popup_ae4d5241bb06027b2d62575dfdde2a72)
+        ;
+
+        
+    
+    
+            circle_marker_1aed1c98a06767d74ffff25c3598a6fc.bindTooltip(
+                `<div>
+                     Hamme Tungsten District (Vance Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_18ae83d6cd0ffe99af95d812f429808f.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_8cbd54167cde054226fa9c4a8a7561d8 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_2600be6707588562c9d849ce2dbd5454 = L.circleMarker(
+                [35.7796, -78.6382],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_8cbd54167cde054226fa9c4a8a7561d8);
+        
+    
+        var popup_679ee3a082ddc8da355de54c9653eac0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e817615bef58da1b87d283c31a2b849c = $(`<div id="html_e817615bef58da1b87d283c31a2b849c" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Raleigh Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Wake</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #39</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Soapstone, actinolite, agate, quartz</p>     </div>     </div>`)[0];
+                popup_679ee3a082ddc8da355de54c9653eac0.setContent(html_e817615bef58da1b87d283c31a2b849c);
+            
+        
+
+        circle_marker_2600be6707588562c9d849ce2dbd5454.bindPopup(popup_679ee3a082ddc8da355de54c9653eac0)
+        ;
+
+        
+    
+    
+            circle_marker_2600be6707588562c9d849ce2dbd5454.bindTooltip(
+                `<div>
+                     Raleigh Area (Wake Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_8cbd54167cde054226fa9c4a8a7561d8.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_7868c2afbc0cb211236c725b2c9bc5d2 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_433e74256c5d41d25c6b5f49e5f645d3 = L.circleMarker(
+                [36.1459, -81.1606],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_7868c2afbc0cb211236c725b2c9bc5d2);
+        
+    
+        var popup_b478000177c0df7df33ba202d93b10ae = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_895f7284a8f8451668fbaadc7e40d987 = $(`<div id="html_895f7284a8f8451668fbaadc7e40d987" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Wilkesboro Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Wilkes</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #40</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Gold, garnet, tourmaline</p>     </div>     </div>`)[0];
+                popup_b478000177c0df7df33ba202d93b10ae.setContent(html_895f7284a8f8451668fbaadc7e40d987);
+            
+        
+
+        circle_marker_433e74256c5d41d25c6b5f49e5f645d3.bindPopup(popup_b478000177c0df7df33ba202d93b10ae)
+        ;
+
+        
+    
+    
+            circle_marker_433e74256c5d41d25c6b5f49e5f645d3.bindTooltip(
+                `<div>
+                     Wilkesboro Area (Wilkes Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_7868c2afbc0cb211236c725b2c9bc5d2.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var feature_group_7734d7e074f2d0e4da1052f67d33e4a8 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_70d5b23ebeeb4b6e524c9932fc473642 = L.circleMarker(
+                [35.9178, -82.2968],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_7734d7e074f2d0e4da1052f67d33e4a8);
+        
+    
+        var popup_08b836209bf501eb63fd1b5575595319 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_85067e2352540dcde92af2786211a21f = $(`<div id="html_85067e2352540dcde92af2786211a21f" style="width: 100.0%; height: 100.0%;">     <div style="width: 300px;">         <h4 style="color: #2c3e50; margin-bottom: 5px;">Burnsville Area</h4>         <p style="margin: 5px 0;"><strong>County:</strong> Yancey</p>         <p style="margin: 5px 0;"><strong>Reference:</strong> #41</p>         <p style="margin: 5px 0;"><strong>Minerals:</strong></p>         <p style="margin: 5px 0; font-size: 11px; color: #34495e;">Mica, feldspar, garnet, beryl, uraninite</p>     </div>     </div>`)[0];
+                popup_08b836209bf501eb63fd1b5575595319.setContent(html_85067e2352540dcde92af2786211a21f);
+            
+        
+
+        circle_marker_70d5b23ebeeb4b6e524c9932fc473642.bindPopup(popup_08b836209bf501eb63fd1b5575595319)
+        ;
+
+        
+    
+    
+            circle_marker_70d5b23ebeeb4b6e524c9932fc473642.bindTooltip(
+                `<div>
+                     Burnsville Area (Yancey Co.)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_7734d7e074f2d0e4da1052f67d33e4a8.addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+    
+            var layer_control_dcb4b8615394cf3ba10cb1cf875c7d2c_layers = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_085974d310845c771dff3f94e27d5cc5,
+                    "Terrain" : tile_layer_bcee0e1123409e6ef3350046d3ae166e,
+                    "Light" : tile_layer_9a512a716dd574ca351f9210e1d3578c,
+                },
+                overlays :  {
+                    "Alamance County" : feature_group_605abd482e2a20662bf776ff88bffb99,
+                    "Alexander County" : feature_group_eeef69e1c129357d5451b39903a0cb3d,
+                    "Alleghany County" : feature_group_55df384ff65fd742ce2e094b09f638c0,
+                    "Ashe County" : feature_group_3c04c225ad5d0b612f832a072f7fe7d2,
+                    "Avery County" : feature_group_ff09c9813ae0733650b919fa267b4baf,
+                    "Buncombe County" : feature_group_dbb284babcbb741c3d40d90a4c5b21a1,
+                    "Burke County" : feature_group_821ae55bf66e0b0a81d4691ffa645788,
+                    "Cabarrus County" : feature_group_feffa56efa91f5bd5982654bad938881,
+                    "Caldwell County" : feature_group_b799e98e0715d0ed727f1fc242d21061,
+                    "Clay County" : feature_group_1137f79948e1e33a4c83fe3a5dd598cd,
+                    "Gaston County" : feature_group_22a8ef408cc3c733d70675f40875b641,
+                    "Macon County" : feature_group_c585549fd2587c0f35246815f832f11d,
+                    "McDowell County" : feature_group_5efed2042fc5f11e229feb07fdb28394,
+                    "Mecklenburg County" : feature_group_0ef618e42273ffc8cb64fbf5de82d511,
+                    "Mitchell County" : feature_group_1cb685f65dcef7d28fb4e8b1ffb898b2,
+                    "Polk County" : feature_group_f625154b820d9ac33b7a995e52433493,
+                    "Rockingham County" : feature_group_5ae0ccad439bec97ea46eefb40c2037e,
+                    "Stanly County" : feature_group_f36acc897f4dd3d594de8c11188bedce,
+                    "Swain County" : feature_group_8d5157b511a65a0d2bc68995526d5f91,
+                    "Transylvania County" : feature_group_fef0c6b9c9b4d77d9969c20323c5e8dc,
+                    "Vance County" : feature_group_18ae83d6cd0ffe99af95d812f429808f,
+                    "Wake County" : feature_group_8cbd54167cde054226fa9c4a8a7561d8,
+                    "Wilkes County" : feature_group_7868c2afbc0cb211236c725b2c9bc5d2,
+                    "Yancey County" : feature_group_7734d7e074f2d0e4da1052f67d33e4a8,
+                },
+            };
+            let layer_control_dcb4b8615394cf3ba10cb1cf875c7d2c = L.control.layers(
+                layer_control_dcb4b8615394cf3ba10cb1cf875c7d2c_layers.base_layers,
+                layer_control_dcb4b8615394cf3ba10cb1cf875c7d2c_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_ff9acfdcba7f1539fd4339706a7e8d59);
+        
+</script>
+</html>

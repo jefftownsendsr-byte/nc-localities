@@ -63,15 +63,16 @@ def build_mineral_map(data_csv: Path, site_dir: Path):
     # Color coding by mineral type
     color_map = {
         "gold": "#FFD700",
+        "silver": "#C0C0C0",
+        "copper": "#B87333",
+        "platinum": "#E5E4E2",
         "emerald": "#50C878",
         "ruby_sapphire": "#E0115F",
         "garnet": "#B22222",
         "gems": "#9370DB",
-        "lithium": "#C0C0C0",
-        "quartz": "#87CEEB",  # Changed from white to sky blue for visibility
-        "rare_earth": "#FF6347",
-        "heavy_minerals": "#8B4513",
         "hiddenite": "#98FF98",
+        "uranium": "#4B5320",
+        "other": "#808080",
     }
 
     html_content = f"""<!doctype html>
@@ -543,15 +544,16 @@ filterControl.onAdd = function(map) {{
     
     const types = [
         ['gold', 'Gold'],
+        ['silver', 'Silver'],
+        ['copper', 'Copper'],
+        ['platinum', 'Platinum'],
         ['emerald', 'Emerald'],
         ['ruby_sapphire', 'Ruby/Sapphire'],
         ['garnet', 'Garnet'],
         ['gems', 'Multi-Gem'],
-        ['lithium', 'Lithium'],
-        ['quartz', 'Quartz'],
-        ['rare_earth', 'Rare Earth'],
-        ['heavy_minerals', 'Heavy Minerals'],
-        ['hiddenite', 'Hiddenite']
+        ['hiddenite', 'Hiddenite'],
+        ['uranium', 'Uranium'],
+        ['other', 'Other']
     ];
     
     types.forEach(([key, label]) => {{
@@ -584,15 +586,16 @@ legend.onAdd = function(map) {{
     
     const types = [
         ['gold', 'Gold'],
+        ['silver', 'Silver'],
+        ['copper', 'Copper'],
+        ['platinum', 'Platinum'],
         ['emerald', 'Emerald'],
         ['ruby_sapphire', 'Ruby/Sapphire'],
         ['garnet', 'Garnet'],
         ['gems', 'Multi-Gem'],
-        ['lithium', 'Lithium'],
-        ['quartz', 'Quartz'],
-        ['rare_earth', 'Rare Earth'],
-        ['heavy_minerals', 'Heavy Minerals'],
-        ['hiddenite', 'Hiddenite']
+        ['hiddenite', 'Hiddenite'],
+        ['uranium', 'Uranium'],
+        ['other', 'Other']
     ];
     
     types.forEach(([key, label]) => {{
