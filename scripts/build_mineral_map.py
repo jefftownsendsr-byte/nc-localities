@@ -82,8 +82,10 @@ def build_mineral_map(data_csv: Path, site_dir: Path):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NC Mineral & Gem Localities Map</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="styles/geomapper.css" />
 <style>
 html,body,#map{{height:100%;margin:0;padding:0;font-family:Arial,sans-serif}}
 #map{{height:100vh}}
@@ -251,6 +253,7 @@ html,body,#map{{height:100%;margin:0;padding:0;font-family:Arial,sans-serif}}
     font-size: 13px;
     line-height: 1.4;
     color: #666;
+    max-width: 250px;
 }}
 
 /* Tooltips */
@@ -313,21 +316,32 @@ html,body,#map{{height:100%;margin:0;padding:0;font-family:Arial,sans-serif}}
 </head>
 <body>
 <div id="map"></div>
+
+<!-- Firebase Config -->
+<script src="config.js"></script>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 const data = {geojson_str};
-const colorMap = {json.dumps(color_map)};
+// Expose colorMap to window for external JS
+window.colorMap = {json.dumps(color_map)};
+const colorMap = window.colorMap;
 
 // State management
-const mapState = {{
+// Expose to window for external JS
+window.mapState = {{
     activeFilters: new Set(Object.keys(colorMap)),
     allMarkers: [],
     markerCluster: null
 }};
+const mapState = window.mapState;
 
 // Initialize map
-const map = L.map('map').setView([35.5,-80.5], 7);
+// Expose map to window for external JS
+window.map = L.map('map').setView([35.5,-80.5], 7);
+const map = window.map;
+
 L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',{{
     maxZoom:19,
     attribution:'&copy; OpenStreetMap contributors'
@@ -632,6 +646,10 @@ function resetView() {{
     }}
 }}
 </script>
+
+<!-- GeoMapper Logic (Must be after map init) -->
+<script type="module" src="js/geomapper.js"></script>
+
 </body>
 </html>"""
 

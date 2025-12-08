@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NC Mineral & Gem Localities Map</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="styles/geomapper.css" />
 <style>
 html,body,#map{height:100%;margin:0;padding:0;font-family:Arial,sans-serif}
 #map{height:100vh}
@@ -174,6 +176,7 @@ html,body,#map{height:100%;margin:0;padding:0;font-family:Arial,sans-serif}
     font-size: 13px;
     line-height: 1.4;
     color: #666;
+    max-width: 250px;
 }
 
 /* Tooltips */
@@ -236,21 +239,32 @@ html,body,#map{height:100%;margin:0;padding:0;font-family:Arial,sans-serif}
 </head>
 <body>
 <div id="map"></div>
+
+<!-- Firebase Config -->
+<script src="config.js"></script>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 const data = {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"name": "Snow Camp Mine (Holman's Mill)", "mineral_type": "gems", "description": "Pyrophyllite, diaspore, sericite, pyrite, topaz, quartz crystals. Alamance County."}, "geometry": {"type": "Point", "coordinates": [-79.42, 35.8533]}}, {"type": "Feature", "properties": {"name": "Emerald Valley Mine", "mineral_type": "emerald", "description": "Emerald, aquamarine beryl, rose quartz, rutile. Alexander County."}, "geometry": {"type": "Point", "coordinates": [-81.0842, 35.9183]}}, {"type": "Feature", "properties": {"name": "McCoury Farm", "mineral_type": "other", "description": "Rutilated quartz. Alexander County."}, "geometry": {"type": "Point", "coordinates": [-81.065, 35.935]}}, {"type": "Feature", "properties": {"name": "George Lackey Property", "mineral_type": "other", "description": "Rutile, rutilated quartz, rose quartz. Alexander County."}, "geometry": {"type": "Point", "coordinates": [-81.095, 35.952]}}, {"type": "Feature", "properties": {"name": "Bald Knob (Crouse Knob)", "mineral_type": "other", "description": "Manganese minerals - alleghanyite, spessartite, tephroite, galaxite. Alleghany County."}, "geometry": {"type": "Point", "coordinates": [-81.155, 36.535]}}, {"type": "Feature", "properties": {"name": "North of Amelia", "mineral_type": "other", "description": "Barite. Alleghany County."}, "geometry": {"type": "Point", "coordinates": [-81.02, 36.55]}}, {"type": "Feature", "properties": {"name": "Ore Knob Mine", "mineral_type": "copper", "description": "Biotite, actinolite, garnet, chalcopyrite, pyrite, cuprite, malachite, azurite. Ashe County."}, "geometry": {"type": "Point", "coordinates": [-81.375, 36.525]}}, {"type": "Feature", "properties": {"name": "Duncan Mine", "mineral_type": "garnet", "description": "Beryl, muscovite, biotite, garnet, feldspar, quartz. Ashe County."}, "geometry": {"type": "Point", "coordinates": [-81.52, 36.395]}}, {"type": "Feature", "properties": {"name": "Cranberry Iron Mine", "mineral_type": "garnet", "description": "Magnetite, uralite, hornblende, epidote, garnet. Avery County."}, "geometry": {"type": "Point", "coordinates": [-81.9183, 36.0533]}}, {"type": "Feature", "properties": {"name": "Frank Deposit", "mineral_type": "other", "description": "Vermiculite, anthophyllite, dunite. Avery County."}, "geometry": {"type": "Point", "coordinates": [-81.95, 36.08]}}, {"type": "Feature", "properties": {"name": "Potato Gap - Blue Ridge Parkway", "mineral_type": "garnet", "description": "Garnet. Buncombe County."}, "geometry": {"type": "Point", "coordinates": [-82.365, 35.715]}}, {"type": "Feature", "properties": {"name": "Balsam Gap", "mineral_type": "ruby_sapphire", "description": "Pink corundum. Buncombe County."}, "geometry": {"type": "Point", "coordinates": [-82.31, 35.635]}}, {"type": "Feature", "properties": {"name": "Goldsmith Mine", "mineral_type": "gold", "description": "Moonstone, chalcedony, garnet, olivine, vermiculite. Buncombe County."}, "geometry": {"type": "Point", "coordinates": [-82.685, 35.655]}}, {"type": "Feature", "properties": {"name": "Brindletown Creek Area", "mineral_type": "gold", "description": "Gold, tetradymite, brookite, smoky quartz, chromite, anatase, beryl, tourmaline, zircon. Burke County."}, "geometry": {"type": "Point", "coordinates": [-81.935, 35.745]}}, {"type": "Feature", "properties": {"name": "Tweedy Garnet Mine", "mineral_type": "garnet", "description": "Garnet, pyrope, rhodolite (Public access, fee site). Burke County."}, "geometry": {"type": "Point", "coordinates": [-81.6883, 35.6383]}}, {"type": "Feature", "properties": {"name": "Reed Gold Mine", "mineral_type": "gold", "description": "Gold, pyrite, chalcopyrite (Historic site, public access). Cabarrus County."}, "geometry": {"type": "Point", "coordinates": [-80.455, 35.255]}}, {"type": "Feature", "properties": {"name": "Silver Shaft", "mineral_type": "silver", "description": "Siderite, pyrite, scheelite, chalcopyrite, magnetite, malachite. Cabarrus County."}, "geometry": {"type": "Point", "coordinates": [-80.365, 35.415]}}, {"type": "Feature", "properties": {"name": "Little River", "mineral_type": "garnet", "description": "Rhodolite garnet in biotite schist. Caldwell County."}, "geometry": {"type": "Point", "coordinates": [-81.585, 36.025]}}, {"type": "Feature", "properties": {"name": "John's River", "mineral_type": "other", "description": "Anthophyllite asbestos, talc. Caldwell County."}, "geometry": {"type": "Point", "coordinates": [-81.645, 35.995]}}, {"type": "Feature", "properties": {"name": "Buck Creek", "mineral_type": "ruby_sapphire", "description": "Corundum (gray to pink), olivine, anorthite, picrolite, spinel, zoisite. Clay County."}, "geometry": {"type": "Point", "coordinates": [-83.815, 35.035]}}, {"type": "Feature", "properties": {"name": "Shooting Creek", "mineral_type": "other", "description": "Rutile crystals. Clay County."}, "geometry": {"type": "Point", "coordinates": [-83.785, 35.055]}}, {"type": "Feature", "properties": {"name": "Tin-Spodumene Belt (Bessemer City)", "mineral_type": "garnet", "description": "Cassiterite, feldspar, mica, garnet, beryl, spodumene, apatite. Gaston County."}, "geometry": {"type": "Point", "coordinates": [-81.295, 35.265]}}, {"type": "Feature", "properties": {"name": "Alexis Area", "mineral_type": "gems", "description": "Kyanite, tourmaline, rutile, lazulite. Gaston County."}, "geometry": {"type": "Point", "coordinates": [-81.125, 35.385]}}, {"type": "Feature", "properties": {"name": "Caler Creek Mine", "mineral_type": "ruby_sapphire", "description": "Ruby, sapphire, garnet (Fee mine). Macon County."}, "geometry": {"type": "Point", "coordinates": [-83.415, 35.145]}}, {"type": "Feature", "properties": {"name": "Cherokee Ruby Mine", "mineral_type": "ruby_sapphire", "description": "Ruby, sapphire, rhodolite garnet (Fee mine). Macon County."}, "geometry": {"type": "Point", "coordinates": [-83.405, 35.155]}}, {"type": "Feature", "properties": {"name": "Bonanza Mine", "mineral_type": "ruby_sapphire", "description": "Ruby, sapphire, garnet (Fee mine). Macon County."}, "geometry": {"type": "Point", "coordinates": [-83.425, 35.165]}}, {"type": "Feature", "properties": {"name": "Sheffield Mine", "mineral_type": "ruby_sapphire", "description": "Ruby, sapphire, garnet, moonstone (Fee mine). Macon County."}, "geometry": {"type": "Point", "coordinates": [-83.395, 35.135]}}, {"type": "Feature", "properties": {"name": "Dysartsville Area (Diamond)", "mineral_type": "gems", "description": "Diamond, gold, sapphire, rutile, monazite. McDowell County."}, "geometry": {"type": "Point", "coordinates": [-82.065, 35.745]}}, {"type": "Feature", "properties": {"name": "Mecklenburg Area", "mineral_type": "gold", "description": "Gold, beryl, garnet. Mecklenburg County."}, "geometry": {"type": "Point", "coordinates": [-80.8431, 35.227]}}, {"type": "Feature", "properties": {"name": "Hawk Mine", "mineral_type": "garnet", "description": "Garnet, apatite, epidote, allanite, tourmaline, pyrite, thulite. Mitchell County."}, "geometry": {"type": "Point", "coordinates": [-82.105, 36.015]}}, {"type": "Feature", "properties": {"name": "Crabtree Emerald Mine", "mineral_type": "emerald", "description": "Emerald (Public fee site). Mitchell County."}, "geometry": {"type": "Point", "coordinates": [-82.165, 35.925]}}, {"type": "Feature", "properties": {"name": "Spruce Pine Mining District", "mineral_type": "uranium", "description": "Feldspar, mica, quartz, beryl, garnet, uraninite, monazite. Mitchell County."}, "geometry": {"type": "Point", "coordinates": [-82.065, 35.915]}}, {"type": "Feature", "properties": {"name": "White Oak Mountain", "mineral_type": "garnet", "description": "Kyanite, staurolite, garnet. Polk County."}, "geometry": {"type": "Point", "coordinates": [-82.255, 35.305]}}, {"type": "Feature", "properties": {"name": "Dan River Area", "mineral_type": "other", "description": "Petrified wood, agate, jasper. Rockingham County."}, "geometry": {"type": "Point", "coordinates": [-79.715, 36.465]}}, {"type": "Feature", "properties": {"name": "Badin Area", "mineral_type": "gold", "description": "Gold, garnet, pyrite. Stanly County."}, "geometry": {"type": "Point", "coordinates": [-80.115, 35.405]}}, {"type": "Feature", "properties": {"name": "Almond Area Pegmatites", "mineral_type": "garnet", "description": "Beryl, garnet, feldspar, mica. Swain County."}, "geometry": {"type": "Point", "coordinates": [-83.585, 35.395]}}, {"type": "Feature", "properties": {"name": "Rosman Area", "mineral_type": "garnet", "description": "Beryl, garnet, monazite. Transylvania County."}, "geometry": {"type": "Point", "coordinates": [-82.825, 35.145]}}, {"type": "Feature", "properties": {"name": "Hamme Tungsten District", "mineral_type": "copper", "description": "Scheelite, wolframite, pyrite, chalcopyrite. Vance County."}, "geometry": {"type": "Point", "coordinates": [-78.455, 36.385]}}, {"type": "Feature", "properties": {"name": "Raleigh Area", "mineral_type": "other", "description": "Soapstone, actinolite, agate, quartz. Wake County."}, "geometry": {"type": "Point", "coordinates": [-78.6382, 35.7796]}}, {"type": "Feature", "properties": {"name": "Wilkesboro Area", "mineral_type": "gold", "description": "Gold, garnet, tourmaline. Wilkes County."}, "geometry": {"type": "Point", "coordinates": [-81.1606, 36.1459]}}, {"type": "Feature", "properties": {"name": "Burnsville Area", "mineral_type": "uranium", "description": "Mica, feldspar, garnet, beryl, uraninite. Yancey County."}, "geometry": {"type": "Point", "coordinates": [-82.2968, 35.9178]}}]};
-const colorMap = {"gold": "#FFD700", "silver": "#C0C0C0", "copper": "#B87333", "platinum": "#E5E4E2", "emerald": "#50C878", "ruby_sapphire": "#E0115F", "garnet": "#B22222", "gems": "#9370DB", "hiddenite": "#98FF98", "uranium": "#4B5320", "other": "#808080"};
+// Expose colorMap to window for external JS
+window.colorMap = {"gold": "#FFD700", "silver": "#C0C0C0", "copper": "#B87333", "platinum": "#E5E4E2", "emerald": "#50C878", "ruby_sapphire": "#E0115F", "garnet": "#B22222", "gems": "#9370DB", "hiddenite": "#98FF98", "uranium": "#4B5320", "other": "#808080"};
+const colorMap = window.colorMap;
 
 // State management
-const mapState = {
+// Expose to window for external JS
+window.mapState = {
     activeFilters: new Set(Object.keys(colorMap)),
     allMarkers: [],
     markerCluster: null
 };
+const mapState = window.mapState;
 
 // Initialize map
-const map = L.map('map').setView([35.5,-80.5], 7);
+// Expose map to window for external JS
+window.map = L.map('map').setView([35.5,-80.5], 7);
+const map = window.map;
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom:19,
     attribution:'&copy; OpenStreetMap contributors'
@@ -555,5 +569,9 @@ function resetView() {
     }
 }
 </script>
+
+<!-- GeoMapper Logic (Must be after map init) -->
+<script type="module" src="js/geomapper.js"></script>
+
 </body>
 </html>
