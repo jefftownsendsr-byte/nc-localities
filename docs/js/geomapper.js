@@ -1,36 +1,22 @@
 /**
- * GeoMapper Core Logic
+ * GeoMapper Core Logic (Resilient Architecture)
  * Handles HUD, Firebase Sync, and User Interactions.
+ * Uses Dynamic Imports for Resilience.
  */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
-
-// Initialize Firebase
-// process.env keys would be better, but for this simpler setup using window.config
-const app = initializeApp(window.firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const markersCollection = collection(db, "markers");
-
-// State
-let isAddingMarker = false;
-let tempMarker = null;
-let currentLatLng = null;
-
+// 1. Initialize UI IMMEDIATELY (The Genius Part: Never fail to show the interface)
 // DOM Elements
 const hudPanel = document.createElement('div');
 hudPanel.className = 'hud-panel';
 hudPanel.innerHTML = `
-    <div class="hud-title">GEO-MAPPER HUD v1.0</div>
+    <div class="hud-title">GEO-MAPPER HUD v2.0</div>
     <div class="hud-grid">
         <span class="hud-label">LATITUDE</span>
         <span class="hud-value" id="hud-lat">--.----</span>
         <span class="hud-label">LONGITUDE</span>
         <span class="hud-value" id="hud-lon">--.----</span>
         <span class="hud-label">STATUS</span>
-        <span class="hud-value" style="color:#2ecc71"><span class="live-dot"></span>ONLINE</span>
+        <span class="hud-value" id="hud-status" style="color:#f1c40f"><span class="live-dot" style="background:#f1c40f"></span>CONNECTING...</span>
         <span class="hud-label">ALTITUDE</span>
         <span class="hud-value" id="hud-alt">--</span>
     </div>
@@ -99,59 +85,66 @@ const modalHTML = `
 `;
 document.body.insertAdjacentHTML('beforeend', modalHTML);
 
+// State
+let isAddingMarker = false;
+let currentLatLng = null;
+let firebaseActive = false;
+let markersCollection = null;
+let storage = null;
+let addDoc, serverTimestamp, ref, uploadBytes, getDownloadURL; // Placeholders
 
-// --- Interaction Logic ---
-
+// --- Core Interaction Logic (Offline Capable) ---
 // HUD Updates
-map.on('mousemove', (e) => {
-    document.getElementById('hud-lat').textContent = e.latlng.lat.toFixed(4);
-    document.getElementById('hud-lon').textContent = e.latlng.lng.toFixed(4);
-});
+if (window.map) {
+    window.map.on('mousemove', (e) => {
+        const latEl = document.getElementById('hud-lat');
+        const lonEl = document.getElementById('hud-lon');
+        if (latEl) latEl.textContent = e.latlng.lat.toFixed(4);
+        if (lonEl) lonEl.textContent = e.latlng.lng.toFixed(4);
+    });
 
-// User Location
+    window.map.on('locationfound', (e) => {
+        const radius = e.accuracy;
+        L.marker(e.latlng).addTo(window.map)
+            .bindPopup("You are within " + radius + " meters from this point").openPopup();
+        L.circle(e.latlng, radius).addTo(window.map);
+        const altEl = document.getElementById('hud-alt');
+        if (altEl) altEl.textContent = e.altitude ? e.altitude.toFixed(1) + 'm' : 'N/A';
+    });
+
+    window.map.on('click', (e) => {
+        if (!isAddingMarker) return;
+        currentLatLng = e.latlng;
+        document.getElementById('field-log-modal').classList.add('active');
+        toggleAddMarkerMode(false);
+    });
+}
+
+// Button Listeners
 document.getElementById('btn-locate').addEventListener('click', () => {
-    map.locate({ setView: true, maxZoom: 16 });
+    if (window.map) window.map.locate({ setView: true, maxZoom: 16 });
 });
 
-map.on('locationfound', (e) => {
-    const radius = e.accuracy;
-    L.marker(e.latlng).addTo(map)
-        .bindPopup("You are within " + radius + " meters from this point").openPopup();
-    L.circle(e.latlng, radius).addTo(map);
-    document.getElementById('hud-alt').textContent = e.altitude ? e.altitude.toFixed(1) + 'm' : 'N/A';
-});
-
-// Add Marker Mode
 const btnAdd = document.getElementById('btn-add-marker');
 btnAdd.addEventListener('click', () => {
-    isAddingMarker = !isAddingMarker;
-    btnAdd.style.background = isAddingMarker ? '#e74c3c' : '#2980b9'; // Toggle Color
+    toggleAddMarkerMode(!isAddingMarker);
+});
+
+function toggleAddMarkerMode(active) {
+    isAddingMarker = active;
+    btnAdd.style.background = isAddingMarker ? '#e74c3c' : '#2980b9';
     btnAdd.innerHTML = isAddingMarker ? '<i class="fa-solid fa-times"></i>' : '<i class="fa-solid fa-plus"></i>';
 
-    if (isAddingMarker) {
-        document.body.style.cursor = 'crosshair';
-        map.getContainer().style.cursor = 'crosshair';
-    } else {
-        document.body.style.cursor = 'default';
-        map.getContainer().style.cursor = '';
+    if (window.map) {
+        if (isAddingMarker) {
+            document.body.style.cursor = 'crosshair';
+            window.map.getContainer().style.cursor = 'crosshair';
+        } else {
+            document.body.style.cursor = 'default';
+            window.map.getContainer().style.cursor = '';
+        }
     }
-});
-
-map.on('click', (e) => {
-    if (!isAddingMarker) return;
-
-    currentLatLng = e.latlng;
-
-    // Open Modal
-    document.getElementById('field-log-modal').classList.add('active');
-
-    // Reset cursor
-    isAddingMarker = false;
-    btnAdd.style.background = '#2980b9';
-    btnAdd.innerHTML = '<i class="fa-solid fa-plus"></i>';
-    document.body.style.cursor = 'default';
-    map.getContainer().style.cursor = '';
-});
+}
 
 // Modal Logic
 document.getElementById('btn-cancel').addEventListener('click', () => {
@@ -171,8 +164,176 @@ fileInput.addEventListener('change', (e) => {
     }
 });
 
+function resetForm() {
+    document.getElementById('log-name').value = '';
+    document.getElementById('log-desc').value = '';
+    document.getElementById('file-preview').textContent = '';
+    selectedFile = null;
+    currentLatLng = null;
+}
+
+// Helper to add marker
+function addMarkerToMap(data) {
+    if (!data.latitude || !data.longitude || !window.map) return;
+
+    const color = window.colorMap && window.colorMap[data.mineral_type] ? window.colorMap[data.mineral_type] : '#e74c3c';
+
+    const marker = L.circleMarker([data.latitude, data.longitude], {
+        radius: 14,
+        fillColor: color,
+        color: "#fff",
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.9,
+        dashArray: "5, 5"
+    });
+
+    let popupContent = `
+        <div class="custom-popup">
+            <div class="popup-title">${data.name}</div>
+            <div class="popup-badge" style="background-color: ${color}">
+                ${data.mineral_type.toUpperCase()} (USER FOUND)
+            </div>
+            <div class="popup-description">${data.description || ''}</div>
+    `;
+
+    if (data.imageUrl) {
+        popupContent += `<div style="margin-top:10px;"><img src="${data.imageUrl}" style="width:100%; border-radius:8px;"></div>`;
+    }
+
+    // Add Report Button
+    popupContent += `
+        <div style="margin-top:10px; text-align:right;">
+            <button class="btn btn-secondary" style="font-size:0.7em; padding:4px 8px;" onclick="window.generateClaimReport('${data.name}', '${data.mineral_type}', ${data.latitude}, ${data.longitude}, '${data.description || ''}')">
+                <i class="fa-solid fa-file-pdf"></i> Generate Report
+            </button>
+        </div>
+    `;
+    popupContent += `</div>`;
+
+    marker.bindPopup(popupContent);
+    marker.addTo(window.map);
+
+    if (window.mapState && window.mapState.markerCluster) {
+        window.mapState.markerCluster.addLayer(marker);
+    }
+}
+
+
+// 2. Initialize Logic (Async)
+async function initLogic() {
+    // A. PWA Registration (Independent of Firebase)
+    if ('serviceWorker' in navigator) {
+        try {
+            const reg = await navigator.serviceWorker.register './sw.js';
+            console.log('Service Worker Registered!', reg.scope);
+        } catch (err) {
+            console.log('Service Worker Failed:', err);
+        }
+    }
+
+    // B. Firebase Loading (Target of potential failure)
+    try {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js");
+        const { getFirestore, collection, addDoc: _addDoc, onSnapshot, serverTimestamp: _st } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
+        const { getStorage, ref: _ref, uploadBytes: _ub, getDownloadURL: _gdu } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js");
+
+        // Assign to global vars for modal use
+        addDoc = _addDoc;
+        serverTimestamp = _st;
+        ref = _ref;
+        uploadBytes = _ub;
+        getDownloadURL = _gdu;
+
+        const app = initializeApp(window.firebaseConfig);
+        const db = getFirestore(app);
+        storage = getStorage(app);
+        markersCollection = collection(db, "markers");
+        firebaseActive = true;
+
+        // Update Status
+        const statusEl = document.getElementById('hud-status');
+        if (statusEl) {
+            statusEl.innerHTML = '<span class="live-dot"></span>ONLINE';
+            statusEl.style.color = '#2ecc71';
+            statusEl.querySelector('.live-dot').style.background = '#2ecc71';
+        }
+
+        // Start Sync
+        onSnapshot(markersCollection, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    addMarkerToMap(data);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.warn("Firebase Init Failed (Offline?):", error);
+        const statusEl = document.getElementById('hud-status');
+        if (statusEl) {
+            statusEl.innerHTML = '<span class="live-dot" style="background:gray"></span>OFFLINE';
+            statusEl.style.color = '#bdc3c7';
+        }
+    }
+
+    // C. PDF Generator
+    try {
+        const { jsPDF } = await import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.es.min.js");
+        window.generateClaimReport = (name, type, lat, lon, desc) => {
+            const doc = new jsPDF();
+            // Header
+            doc.setFillColor(44, 62, 80); // Dark Blue
+            doc.rect(0, 0, 210, 40, "F");
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.text("OFFICIAL CLAIM REPORT", 20, 25);
+
+            doc.setFontSize(10);
+            doc.text("NC GEOMAPPER ELITE", 160, 25);
+
+            // Content
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+            doc.text(`Site: ${name}`, 20, 60);
+
+            doc.setFontSize(12);
+            doc.text(`Mineral Type: ${type.toUpperCase()}`, 20, 75);
+
+            doc.setFillColor(240, 240, 240);
+            doc.rect(20, 85, 170, 30, "F");
+            doc.text(`GPS Coordinates:`, 25, 95);
+            doc.setFont("courier", "bold");
+            doc.text(`${lat.toFixed(6)}, ${lon.toFixed(6)}`, 25, 105);
+            doc.setFont("helvetica", "normal");
+
+            doc.text(`Notes:`, 20, 130);
+            const splitDesc = doc.splitTextToSize(desc, 170);
+            doc.text(splitDesc, 20, 140);
+
+            // Footer
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Generated by GeoMapper Elite - ${new Date().toLocaleDateString()}`, 20, 280);
+
+            doc.save(`${name.replace(/\s+/g, '_')}_Claim_Report.pdf`);
+        };
+    } catch (e) {
+        console.warn("PDF Module Failed:", e);
+    }
+}
+
+// 3. Save Logic (Dependent on Firebase)
 document.getElementById('btn-save').addEventListener('click', async () => {
     const btn = document.getElementById('btn-save');
+
+    if (!firebaseActive) {
+        alert("Offline Mode: Saving not currently supported without internet.");
+        return;
+    }
+
     btn.textContent = 'Uploading...';
     btn.disabled = true;
 
@@ -180,17 +341,14 @@ document.getElementById('btn-save').addEventListener('click', async () => {
         const name = document.getElementById('log-name').value || "Unknown Discovery";
         const type = document.getElementById('log-type').value;
         const desc = document.getElementById('log-desc').value;
-
         let imageUrl = null;
 
-        // Upload photo if exists
         if (selectedFile) {
             const storageRef = ref(storage, 'uploads/' + Date.now() + '_' + selectedFile.name);
             await uploadBytes(storageRef, selectedFile);
             imageUrl = await getDownloadURL(storageRef);
         }
 
-        // Save to Firestore
         await addDoc(markersCollection, {
             name: name,
             mineral_type: type,
@@ -215,121 +373,5 @@ document.getElementById('btn-save').addEventListener('click', async () => {
     }
 });
 
-function resetForm() {
-    document.getElementById('log-name').value = '';
-    document.getElementById('log-desc').value = '';
-    document.getElementById('file-preview').textContent = '';
-    selectedFile = null;
-    currentLatLng = null;
-}
-
-// --- Real-time Sync --- (The Magic part)
-onSnapshot(markersCollection, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-            const data = change.doc.data();
-            addMarkerToMap(data);
-        }
-    });
-});
-
-// --- PWA Registration ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker Registered!', reg.scope))
-            .catch(err => console.log('Service Worker Failed:', err));
-    });
-}
-
-function addMarkerToMap(data) {
-    if (!data.latitude || !data.longitude) return;
-
-    const color = window.colorMap && window.colorMap[data.mineral_type] ? window.colorMap[data.mineral_type] : '#e74c3c';
-
-    const marker = L.circleMarker([data.latitude, data.longitude], {
-        radius: 14, // Slightly bigger than standard
-        fillColor: color,
-        color: "#fff",
-        weight: 3, // Thicker border
-        opacity: 1,
-        fillOpacity: 0.9,
-        dashArray: "5, 5" // Dashed line to indicate "Unverified/User"
-    });
-
-    let popupContent = `
-        <div class="custom-popup">
-            <div class="popup-title">${data.name}</div>
-            <div class="popup-badge" style="background-color: ${color}">
-                ${data.mineral_type.toUpperCase()} (USER FOUND)
-            </div>
-            <div class="popup-description">${data.description || ''}</div>
-    `;
-
-    if (data.imageUrl) {
-        popupContent += `<div style="margin-top:10px;"><img src="${data.imageUrl}" style="width:100%; border-radius:8px;"></div>`;
-    }
-
-    // Add Report Button
-    popupContent += `
-        <div style="margin-top:10px; text-align:right;">
-            <button class="btn btn-secondary" style="font-size:0.7em; padding:4px 8px;" onclick="window.generateClaimReport('${data.name}', '${data.mineral_type}', ${data.latitude}, ${data.longitude}, '${data.description || ''}')">
-                <i class="fa-solid fa-file-pdf"></i> Generate Report
-            </button>
-        </div>
-    `;
-
-    popupContent += `</div>`;
-
-    marker.bindPopup(popupContent);
-    marker.addTo(map); // Add directly to map (or cluster if you exposed it)
-
-    // Ideally add to the cluster group if exposed, but adding to map works for now
-    if (window.mapState && window.mapState.markerCluster) {
-        window.mapState.markerCluster.addLayer(marker);
-    }
-}
-
-// --- The Scribe: PDF Generator ---
-import { jsPDF } from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.es.min.js";
-
-window.generateClaimReport = (name, type, lat, lon, desc) => {
-    const doc = new jsPDF();
-
-    // Header
-    doc.setFillColor(44, 62, 80); // Dark Blue
-    doc.rect(0, 0, 210, 40, "F");
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.text("OFFICIAL CLAIM REPORT", 20, 25);
-
-    doc.setFontSize(10);
-    doc.text("NC GEOMAPPER ELITE", 160, 25);
-
-    // Content
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(16);
-    doc.text(`Site: ${name}`, 20, 60);
-
-    doc.setFontSize(12);
-    doc.text(`Mineral Type: ${type.toUpperCase()}`, 20, 75);
-
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, 85, 170, 30, "F");
-    doc.text(`GPS Coordinates:`, 25, 95);
-    doc.setFont("courier", "bold");
-    doc.text(`${lat.toFixed(6)}, ${lon.toFixed(6)}`, 25, 105);
-    doc.setFont("helvetica", "normal");
-
-    doc.text(`Notes:`, 20, 130);
-    const splitDesc = doc.splitTextToSize(desc, 170);
-    doc.text(splitDesc, 20, 140);
-
-    // Footer
-    doc.setFontSize(10);
-    doc.setTextColor(150, 150, 150);
-    doc.text(`Generated by GeoMapper Elite - ${new Date().toLocaleDateString()}`, 20, 280);
-
-    doc.save(`${name.replace(/\s+/g, '_')}_Claim_Report.pdf`);
-};
+// Go!
+initLogic();

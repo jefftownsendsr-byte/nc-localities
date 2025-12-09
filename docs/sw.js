@@ -1,4 +1,4 @@
-const CACHE_NAME = 'geomapper-elite-v1';
+const CACHE_NAME = 'geomapper-elite-v2';
 const ASSETS_TO_CACHE = [
     './mineral_map.html',
     './config.js',
@@ -10,7 +10,11 @@ const ASSETS_TO_CACHE = [
     'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
     'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-    'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
+    'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js',
+    'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js',
+    'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js',
+    'https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.es.min.js'
 ];
 
 // Install Event - Cache Core Assets
