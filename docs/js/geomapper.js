@@ -195,6 +195,7 @@ function addMarkerToMap(data) {
                 ${data.mineral_type.toUpperCase()} (USER FOUND)
             </div>
             <div class="popup-description">${data.description || ''}</div>
+            ${data.displayName ? `<div class="discovery-badge"><i class="fa-solid fa-medal"></i> ${data.displayName}</div>` : ''}
     `;
 
     if (data.imageUrl) {
@@ -237,6 +238,7 @@ async function initLogic() {
         const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js");
         const { getFirestore, collection, addDoc: _addDoc, onSnapshot, serverTimestamp: _st } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
         const { getStorage, ref: _ref, uploadBytes: _ub, getDownloadURL: _gdu } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js");
+        const { getAuth, GoogleAuthProvider: _GAP, signInWithPopup: _siwp, signOut: _so, onAuthStateChanged: _oasc } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js");
 
         // Assign to global vars for modal use
         addDoc = _addDoc;
@@ -245,10 +247,25 @@ async function initLogic() {
         uploadBytes = _ub;
         getDownloadURL = _gdu;
 
+        // Auth Globals
+        signInWithPopup = _siwp;
+        GoogleAuthProvider = _GAP;
+        signOut = _so;
+        onAuthStateChanged = _oasc;
+
         const app = initializeApp(window.firebaseConfig);
         const db = getFirestore(app);
         storage = getStorage(app);
         markersCollection = collection(db, "markers");
+
+        // Initialize Auth
+        auth = getAuth(app);
+        provider = new GoogleAuthProvider();
+
+        onAuthStateChanged(auth, (user) => {
+            updateAuthUI(user);
+        });
+
         firebaseActive = true;
 
         // Update Status
@@ -357,7 +374,10 @@ document.getElementById('btn-save').addEventListener('click', async () => {
             longitude: currentLatLng.lng,
             imageUrl: imageUrl,
             timestamp: serverTimestamp(),
-            source: 'user_submission'
+            source: 'user_submission',
+            uid: currentUser ? currentUser.uid : null,
+            displayName: currentUser ? currentUser.displayName : 'Anonymous Scout',
+            photoURL: currentUser ? currentUser.photoURL : null
         });
 
         alert("Discovery Logged Successfully!");
@@ -649,7 +669,67 @@ function getAngleDiff(h, t) {
 }
 
 
+// --- The Crown: Authentication ---
+let currentUser = null;
+let auth = null;
+let provider = null;
+let signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged;
+
+async function initAuth() {
+    // 1. Initial UI (Signed Out State)
+    const btn = document.createElement('button');
+    btn.className = 'btn-auth';
+    btn.id = 'btn-auth';
+    btn.innerHTML = '<i class="fa-brands fa-google"></i> Sign In to Claim';
+    btn.onclick = handleAuthClick;
+    document.body.appendChild(btn);
+
+    // 2. Load Auth Libs (Dynamic Import integration handled in initLogic, but we need to ensure they are assigned)
+    // We'll trust initLogic to load them and call a setup function, OR we lazy load here if needed.
+    // For simplicity, we'll hook into the existing initLogic which we will modify shortly.
+}
+
+async function handleAuthClick() {
+    if (!auth) {
+        alert("Connecting to Identity Server...");
+        return;
+    }
+
+    if (currentUser) {
+        // Sign Out
+        try {
+            await signOut(auth);
+            // UI updates in observer
+        } catch (e) {
+            console.error("Sign Out Error", e);
+        }
+    } else {
+        // Sign In
+        try {
+            await signInWithPopup(auth, provider);
+            // UI updates in observer
+        } catch (e) {
+            console.error("Auth Error", e);
+            alert("Sign In Failed: " + e.message);
+        }
+    }
+}
+
+function updateAuthUI(user) {
+    const btn = document.getElementById('btn-auth');
+    if (user) {
+        currentUser = user;
+        btn.innerHTML = `<img src="${user.photoURL}" class="user-avatar"> ${user.displayName.split(' ')[0]}`;
+        btn.style.background = '#ecf0f1';
+    } else {
+        currentUser = null;
+        btn.innerHTML = '<i class="fa-brands fa-google"></i> Sign In to Claim';
+        btn.style.background = 'white';
+    }
+}
+
 // Go!
 initLogic();
+initAuth();
 setTimeout(initOracle, 2000);
 setTimeout(initScanner, 2500);
