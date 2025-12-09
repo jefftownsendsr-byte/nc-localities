@@ -296,3 +296,72 @@ textarea.form-control {
     100% { stroke-opacity: 0.6; stroke-width: 2; }
 }
 
+
+/* The Royal Lens: AR Scanner */
+.scanner-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: black;
+    z-index: 2000;
+    display: none;
+}
+.scanner-overlay.active { display: block; }
+.scanner-video {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+}
+.scanner-hud {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 2001;
+    pointer-events: none;
+}
+.ar-marker {
+    position: absolute;
+    background: rgba(44, 62, 80, 0.85);
+    border: 1px solid #f1c40f;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    width: 150px;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    transition: left 0.2s, top 0.2s, opacity 0.2s;
+}
+.ar-marker h3 { margin: 0 0 5px 0; font-size: 14px; color: #f1c40f; }
+.scanner-compass {
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    width: 300px; height: 50px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid white;
+    border-radius: 25px;
+    overflow: hidden;
+}
+.compass-tick {
+    position: absolute;
+    top: 0; width: 2px; height: 10px; background: white;
+}
+.compass-label {
+    position: absolute;
+    top: 15px; font-size: 10px; color: white; transform: translateX(-50%);
+}
+.scanner-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 2002;
+    font-weight: bold;
+    pointer-events: auto;
+}
+
