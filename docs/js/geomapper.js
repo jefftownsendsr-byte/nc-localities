@@ -225,7 +225,7 @@ async function initLogic() {
     // A. PWA Registration (Independent of Firebase)
     if ('serviceWorker' in navigator) {
         try {
-            const reg = await navigator.serviceWorker.register './sw.js';
+            const reg = await navigator.serviceWorker.register('./sw.js');
             console.log('Service Worker Registered!', reg.scope);
         } catch (err) {
             console.log('Service Worker Failed:', err);
@@ -373,5 +373,106 @@ document.getElementById('btn-save').addEventListener('click', async () => {
     }
 });
 
+// --- The Oracle: Vein Tracer ---
+let oracleActive = false;
+let veinLayer = L.layerGroup();
+
+function initOracle() {
+    // 1. Add Toggle to HUD or Controls
+    // Using a new control for tools
+    const toolControl = L.control({ position: 'topright' });
+    toolControl.onAdd = function (map) {
+        const div = L.DomUtil.create('div', 'leaflet-bar');
+        div.innerHTML = `
+            <button class="reset-btn" id="btn-oracle" style="background:#2c3e50; color:white; border:1px solid #f1c40f;" onclick="toggleOracle()">
+                <i class="fa-solid fa-eye"></i> Oracle
+            </button>
+        `;
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+    };
+    if (window.map) toolControl.addTo(window.map);
+
+    window.toggleOracle = () => {
+        oracleActive = !oracleActive;
+        const btn = document.getElementById('btn-oracle');
+        if (oracleActive) {
+            btn.style.background = '#f1c40f'; // Gold
+            btn.style.color = '#2c3e50';
+            calculateAndDrawVeins();
+            alert("The Oracle: Analyzing Topography & Mineral Alignment...");
+        } else {
+            btn.style.background = '#2c3e50';
+            btn.style.color = 'white';
+            veinLayer.clearLayers();
+        }
+    };
+}
+
+function calculateAndDrawVeins() {
+    if (!window.map || !window.mapState || !window.mapState.allMarkers) return;
+
+    veinLayer.clearLayers();
+    const markers = window.mapState.allMarkers;
+    const grouped = {};
+
+    // 1. Group by Mineral Type
+    markers.forEach(m => {
+        // Use the custom property we added in the build script
+        // Note: m.feature.properties is from GeoJSON, but we added .mineralType to the marker object directly in the HTML script
+        const type = m.mineralType || 'unknown';
+        if (!grouped[type]) grouped[type] = [];
+        grouped[type].push(m);
+    });
+
+    // 2. Logic: Connect neighbors within range (e.g., 25km)
+    const MAX_VEIN_DISTANCE_METERS = 25000;
+
+    Object.keys(grouped).forEach(type => {
+        const group = grouped[type];
+        if (group.length < 2) return;
+
+        const color = window.colorMap[type] || '#fff';
+
+        for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+                const m1 = group[i];
+                const m2 = group[j];
+                const latlng1 = m1.getLatLng();
+                const latlng2 = m2.getLatLng();
+
+                const dist = latlng1.distanceTo(latlng2);
+
+                // "The Logic": If close, they are likely part of the same system
+                if (dist < MAX_VEIN_DISTANCE_METERS) {
+                    const line = L.polyline([latlng1, latlng2], {
+                        color: color,
+                        weight: 3,
+                        className: 'vein-line' // CSS Animation
+                    });
+
+                    // Tooltip explaining the logic
+                    line.bindTooltip(`${formatMineralType(type)} Vein Connection<br>${(dist / 1000).toFixed(1)}km Segment`, {
+                        sticky: true,
+                        className: 'leaflet-tooltip'
+                    });
+
+                    veinLayer.addLayer(line);
+                }
+            }
+        }
+    });
+
+    veinLayer.addTo(window.map);
+}
+
+// Helper (Duplicated from HTML script for safety, or we assume it's global)
+function formatMineralType(type) {
+    return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+
 // Go!
 initLogic();
+// Start Oracle after map is ready (small delay to ensure markers are populated)
+setTimeout(initOracle, 2000);
